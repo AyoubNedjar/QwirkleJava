@@ -14,9 +14,8 @@ public class Bag {
      * initializes the 108 tiles in the bag only once
      */
     private Bag() {
-        Shape[] formes = {Shape.CROSS, Shape.SQUARE, Shape.ROUND, Shape.STAR, Shape.PLUS, Shape.DIAMOND};
-        Color[] couleurs = {Color.BLUE, Color.RED, Color.GREEN, Color.ORANGE, Color.YELLOW, Color.PURPLE};
-
+        Shape[] formes = Shape.values();
+        Color[] couleurs = Color.values();
 
         for (int i = 0; i < couleurs.length; i++) {
             for (int j = 0; j < formes.length; j++) {
@@ -36,11 +35,10 @@ public class Bag {
      */
     public static Bag getInstance() {
         if (instance == null) {
-            return new Bag();
+            instance =  new Bag();
         }
         return instance;
     }
-
 
     /**
      * gives random tiles in the bag
@@ -48,30 +46,31 @@ public class Bag {
      * @return the number of tiles
      */
     public Tile[] getRandomTiles(int n) {
-
-
         int nbtuiles = tiles.size();
+
         if (nbtuiles == 0) {
             return null;
         }
 
         //si le nombre de tuiles restantes est inferieur à n
-        if (nbtuiles < n) {
-            Tile[] tab = new Tile[nbtuiles];
-            for (int i = 0; i < nbtuiles; i++) {
-                int index = (int) (Math.random() * nbtuiles);
-                tab[i] = tiles.get(index);
-                tiles.remove(index);
-                nbtuiles--;
-            }
-            return tab;
+        if (nbtuiles <=n) {
+            return (Tile[]) tiles.toArray();// cela va convertir la liste en un tableau vu que les restantes on les prend quand meme
+//            Tile[] tab = new Tile[nbtuiles];
+//            for (int i = 0; i < nbtuiles; i++) {
+//                int index = (int) (Math.random() * nbtuiles);
+//                tab[i] = tiles.get(index);
+//                tiles.remove(index);
+//                nbtuiles--;
+//            }
+//            return tab;
             //on retourne un tableau contenant les tuiles restantes
 
         } else {
             Tile[] tab2 = new Tile[n];
             for (int i = 0; i < n; i++) {
                 int index = (int) (Math.random() * nbtuiles);
-                tab2[i] = tiles.get(index);
+                Tile t = tiles.get(index);
+                tab2[i] = new Tile(t.color(),t.shape());//cela creer une autre référence car on supprime l'objet juste après
                 tiles.remove(index);
                 nbtuiles--;
             }
@@ -84,7 +83,5 @@ public class Bag {
      * give the size of the bag
      * @return the numbers of tiles in the bag
      */
-    public int size() {
-        return tiles.size();
-    }
+    public int size() {return tiles.size();}
 }

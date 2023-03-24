@@ -2,7 +2,7 @@ package g58183.qwirkle.model;
 
 public enum Direction {
 
-    LEFT(0, -1),RIGHT(0, 1),HIGH(-1, 0),DOWN(1, 0);
+    LEFT(0, -1),RIGHT(0, 1), UP(-1, 0),DOWN(1, 0);
 
     private final int  deltaRow;
     private final int deltaColumn;
@@ -22,9 +22,9 @@ public enum Direction {
 
     public Direction opposite(){
         switch (this){
-            case DOWN : return HIGH;
+            case DOWN : return UP;
             case LEFT:  return RIGHT;
-            case HIGH: return DOWN;
+            case UP: return DOWN;
             case RIGHT: return LEFT;
 
         }
