@@ -70,7 +70,6 @@ public class Grid {
                 c += col;
             }
 
-
         }
     }
 
@@ -94,23 +93,112 @@ public class Grid {
 
     }
 
-    private boolean hasAdjacent(int row, int col) {
+    private boolean hasAdjacent(int row, int col, Tile tile) {
         //elle ne doit pas se retrouver au milieu de null part
+        //
+        if (row > 0 && tiles[row - 1][col] != null && isValidColorOrShape(tiles[row - 1][col], tile)) { // Vérifier la case au-dessus
 
-        if (row > 0 && tiles[row - 1][col] != null) { // Vérifier la case au-dessus
             return true;
         }
-        if (row < 90 && tiles[row + 1][col] != null) { // Vérifier la case en-dessous
+        if (row < 90 && tiles[row + 1][col] != null && isValidColorOrShape(tiles[row + 1][col], tile)) { // Vérifier la case en-dessous
+
             return true;
         }
-        if (col > 0 && tiles[row][col - 1] != null) { // Vérifier la case à gauche
+        if (col > 0 && tiles[row][col - 1] != null &&  isValidColorOrShape(tiles[row][col - 1], tile)) { // Vérifier la case à gauche
+
             return true;
         }
-        if (col < 90 && tiles[row][col + 1] != null) { // Vérifier la case à droite
+        if (col < 90 && tiles[row][col + 1] != null && isValidColorOrShape(tiles[row][col + 1], tile)) { // Vérifier la case à droite
+
             return true;
         }
 
         return false;
+
+    }
+
+    private boolean isValidColorOrShape(Tile t1, Tile t2){
+        return t1.color() == t2.color() || t1.shape() == t2.shape();
+    }
+    private boolean horizontal(int row,int col){//pour vérifier si ya 6 tuiles horizontalement
+
+        boolean canleft = false;
+        boolean canright  = false;
+
+        if (tiles[row][col - 1] != null ) { // Vérifier la case à gauche
+           canleft =true;
+        }
+
+        if ( tiles[row][col + 1] != null ) { // Vérifier la case à droite
+          canright = true;
+        }
+
+        if(!canleft && !canright){//si il n'y a aucune tuile à l'horizontale
+            return true;
+        }
+
+        if(canleft && !canright){// si il y a une tuile à gauche mais aucune à droite
+            //go left
+            for (int i = 1; i <= 6; i++) {//a partir de la tile qui suit
+                if(tiles[row][col-i]==null){
+                    return true;//si on trouve une case vide on peu ajouter
+                }
+            }
+            return false;//c'est que 6 position après il y avait
+        }else if(!canleft && canright){
+            //go right
+            for (int i = 1; i <= 6; i++) {
+                if(tiles[row][col+i]==null){
+                    return true;
+                }
+            }
+            return false;//il y d=plus de place
+        }else{
+            //si on est au milieu, on fait la somme des tuiles qu'il y a de chaque coté et on regarde si ca depasse 6
+            int cptdroit = 0;
+            int cptgauche = 0;
+            int i = 1;
+            while(tiles[row][col+i] != null && cptdroit<6){
+                cptdroit++;
+                i++;
+            }
+            i = 1;
+            while(tiles[row][col-i] != null && cptgauche<6){
+                cptgauche++;
+                i++;
+            }
+            if((cptdroit + cptgauche) > 6){
+                return false;
+            }
+            return true;
+        }
+
+    }
+
+
+    public void add(int row, int col,Direction d, Tile... line) {
+        //vérifier si la ligne contient la meme tuile
+//creer methode isvalid -> comme addfirst mais exception  return false
+        int deltaRow = d.getDeltaRow();
+        int deltaColumn = d.getDeltaColumn();
+        int lg = row;               // t,T,T
+        int cln = col;
+
+                    add(lg,cln,line[0]);
+                    lg += deltaRow;
+                    cln += deltaColumn;
+
+                for (int j = 1; j < line.length; j++) {//je peux mettre toutes les tuiles à la suite des autres vu que tout est o
+
+                    while (tiles[lg][cln]!=null){//je fais qu'avancer
+                        lg += deltaRow;
+                        cln += deltaColumn;
+                    }
+                    add(lg,cln,line[j]);
+                    lg += deltaRow;
+                    cln += deltaColumn;
+                }
+
 
     }
 
