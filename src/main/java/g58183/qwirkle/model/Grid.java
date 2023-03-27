@@ -69,7 +69,6 @@ public class Grid {
                 l += ligne;
                 c += col;
             }
-
         }
     }
 
@@ -77,7 +76,7 @@ public class Grid {
 
         if (row > 0 && row < 90 && col > 0 && col < 90) {
             if (tiles[row][col] == null) {
-                if (hasAdjacent(row, col)) {
+                if (hasAdjacent(row, col, tile)) {
 
                     tiles[row][col] = tile;
                 } else {
@@ -94,33 +93,41 @@ public class Grid {
     }
 
     private boolean hasAdjacent(int row, int col, Tile tile) {
-        //elle ne doit pas se retrouver au milieu de null part
-        //
-        if (row > 0 && tiles[row - 1][col] != null && isValidColorOrShape(tiles[row - 1][col], tile)) { // Vérifier la case au-dessus
 
-            return true;
+
+        if (row > 0 && tiles[row - 1][col] != null
+                && isValidColorOrShape(tiles[row - 1][col], tile)) { // Vérifier la case au-dessus
         }
-        if (row < 90 && tiles[row + 1][col] != null && isValidColorOrShape(tiles[row + 1][col], tile)) { // Vérifier la case en-dessous
 
-            return true;
+        if (row < 90 && tiles[row + 1][col] != null
+                && isValidColorOrShape(tiles[row + 1][col], tile)) { // Vérifier la case en-dessous
+
+
+
         }
-        if (col > 0 && tiles[row][col - 1] != null &&  isValidColorOrShape(tiles[row][col - 1], tile)) { // Vérifier la case à gauche
+        if (col > 0 && tiles[row][col - 1] != null
+                &&  isValidColorOrShape(tiles[row][col - 1], tile)) { // Vérifier la case à gauche
 
-            return true;
+
         }
-        if (col < 90 && tiles[row][col + 1] != null && isValidColorOrShape(tiles[row][col + 1], tile)) { // Vérifier la case à droite
+        if (col < 90 && tiles[row][col + 1] != null
+                && isValidColorOrShape(tiles[row][col + 1], tile)) { // Vérifier la case à droite
 
-            return true;
+
+
         }
 
         return false;
 
     }
+    //idée pour is valid: a chaque fois qu'on va placer une tuile on voit sa ligne et sa colone , pour la
+    //placée il faut que le truc commun (il faut voir le point en commun des deux premier élément de la liste) pour chaque direction
+    //si il a les deux point en commun il peut mettre la tuile
 
-    private boolean isValidColorOrShape(Tile t1, Tile t2){
+    private boolean isValidColorOrShape(Tile t1, Tile t2){//attention imaginons si elle se trouve au bout d'une ligne on ne peut pas accepter ca alors
         return t1.color() == t2.color() || t1.shape() == t2.shape();
     }
-    private boolean horizontal(int row,int col){//pour vérifier si ya 6 tuiles horizontalement
+    private boolean horizontal(int row,int col){//pour vérifier si ya 6 tuiles horizontalement ou pas
 
         boolean canleft = false;
         boolean canright  = false;
@@ -133,7 +140,7 @@ public class Grid {
           canright = true;
         }
 
-        if(!canleft && !canright){//si il n'y a aucune tuile à l'horizontale
+        if(!canleft && !canright){//si il n'y a aucune tuile à l'horizontale (sur la meme ligne), si la tuile n'a aucun voisin alors
             return true;
         }
 
@@ -144,7 +151,7 @@ public class Grid {
                     return true;//si on trouve une case vide on peu ajouter
                 }
             }
-            return false;//c'est que 6 position après il y avait
+            return false;//c'est que 6 position après il y avait aucun null donc que des tuiles
         }else if(!canleft && canright){
             //go right
             for (int i = 1; i <= 6; i++) {
@@ -174,44 +181,86 @@ public class Grid {
         }
 
     }
+    private boolean Vertical(int row,int col){//pour vérifier si ya 6 tuiles horizontalement ou pas
+    //attention il faut faire gaffe à ne pas sortir du tableau si
 
+        boolean canup = false;
+        boolean candown  = false;
 
-    public void add(int row, int col,Direction d, Tile... line) {
-        //vérifier si la ligne contient la meme tuile
-//creer methode isvalid -> comme addfirst mais exception  return false
-        int deltaRow = d.getDeltaRow();
-        int deltaColumn = d.getDeltaColumn();
-        int lg = row;               // t,T,T
-        int cln = col;
+        if (tiles[row-1][col] != null ) { // Vérifier la case en haut
+            canup =true;
+        }
 
-                    add(lg,cln,line[0]);
-                    lg += deltaRow;
-                    cln += deltaColumn;
+        if ( tiles[row+1][col] != null ) { // Vérifier la case en bas
+            candown = true;
+        }
 
-                for (int j = 1; j < line.length; j++) {//je peux mettre toutes les tuiles à la suite des autres vu que tout est o
+        if(!canup && !candown){//si il n'y a aucune tuile à la verticale (sur la meme ligne)
+            return true;
+        }
 
-                    while (tiles[lg][cln]!=null){//je fais qu'avancer
-                        lg += deltaRow;
-                        cln += deltaColumn;
-                    }
-                    add(lg,cln,line[j]);
-                    lg += deltaRow;
-                    cln += deltaColumn;
+        if(canup && !candown){// si il y a une tuile en haut mais aucune en bas
+            //go left
+            for (int i = 1; i <= 6; i++) {//a partir de la tile qui suit
+                if(tiles[row-1][col]==null){
+                    return true;//si on trouve une case vide on peu ajouter
                 }
-
+            }
+            return false;//c'est que 6 position après il y avait aucun null donc que des tuiles
+        }else if(!canup && candown){
+            //go right
+            for (int i = 1; i <= 6; i++) {
+                if(tiles[row+1][col]==null){
+                    return true;
+                }
+            }
+            return false;//il y d=plus de place
+        }else{
+            //si on est au milieu, on fait la somme des tuiles qu'il y a de chaque coté et on regarde si ca depasse 6
+            int cpthaut = 0;
+            int cptbas = 0;
+            int i = 1;
+            while(tiles[row-i][col] != null && cpthaut<6){
+                cpthaut++;
+                i++;
+            }
+            i = 1;
+            while(tiles[row-i][col] != null && cptbas<6){
+                cptbas++;
+                i++;
+            }
+            if((cpthaut + cptbas) > 6){
+                return false;
+            }
+            return true;
+        }
 
     }
 
 
+    public void add(int row, int col,Direction d, Tile... line) {
+
+        int deltaRow = d.getDeltaRow();
+        int deltaColumn = d.getDeltaColumn();
+
+        int lg = row;               // t,T,T
+        int cln = col;
+
+        add(lg,cln,line[0]);
+        lg += deltaRow;
+        cln += deltaColumn;
+
+        for (int i = 1; i < line.length; i++) {
+            add(lg,cln,line[0]);
+            lg += deltaRow;
+            cln += deltaColumn;
+        }
+
+        //vérifier si la ligne contient la meme tuile
 
 
-                   /* while (tiles[nvlg][nvcol]!=null && cpt < 2){
 
-
-        nvlg = nvlg+row;
-        nvcol = nvcol + col;
-    }*/
-
+    }
 
 }
 
@@ -429,3 +478,4 @@ public class Grid {
             System.out.println(e.getMessage());
         }
 
+ */
