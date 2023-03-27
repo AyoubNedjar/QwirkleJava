@@ -262,7 +262,16 @@ public class Grid {
 
     }
 
+    public void add (TileAtPosition... tile){
+        for (int i = 0; i < tile.length; i++) {
+            add(tile[i].row(),tile[i].col(),tile[i].tile());
+        }
+    }
+
 }
+
+
+
 
 
 
