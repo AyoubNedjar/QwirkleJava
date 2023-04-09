@@ -55,16 +55,7 @@ public class Bag {
         //si le nombre de tuiles restantes est inferieur à n
         if (nbtuiles <=n) {
             return (Tile[]) tiles.toArray();// cela va convertir la liste en un tableau vu que les restantes on les prend quand meme
-//            Tile[] tab = new Tile[nbtuiles];
-//            for (int i = 0; i < nbtuiles; i++) {
-//                int index = (int) (Math.random() * nbtuiles);
-//                tab[i] = tiles.get(index);
-//                tiles.remove(index);
-//                nbtuiles--;
-//            }
-//            return tab;
-            //on retourne un tableau contenant les tuiles restantes
-
+//
         } else {
             Tile[] tab2 = new Tile[n];
             for (int i = 0; i < n; i++) {
