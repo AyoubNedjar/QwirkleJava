@@ -118,6 +118,9 @@ public class Game {
 
 
     }
+    public View getGrid(){
+        return
+    }
     public String getCurrentPlayerName(){
         return player[current].getNom();
     }
