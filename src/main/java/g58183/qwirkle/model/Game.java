@@ -84,7 +84,7 @@ public class Game {
             player[current].remove(tab);
             nextPlayer();
         }catch(QwirkleException e){
-            System.out.println(e.getMessage()); 
+            System.out.println(e.getMessage());
         }
         ;
     }
@@ -110,6 +110,7 @@ public class Game {
                 i++;
             }
             player[current].remove(tab);
+
             nextPlayer();
         }catch (QwirkleException e){
             System.out.println(e.getMessage());
