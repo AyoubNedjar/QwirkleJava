@@ -118,8 +118,8 @@ public class Game {
 
 
     }
-    public View getGrid(){
-        return
+    public GridView getGrid(){
+        return new GridView(grid);
     }
     public String getCurrentPlayerName(){
         return player[current].getNom();
