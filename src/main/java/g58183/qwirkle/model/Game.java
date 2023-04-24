@@ -27,7 +27,7 @@ public class Game {
     public void first(Direction d, int... is){//2,4,1
 
         Tile[] tab = new Tile[is.length];// le nb de tuiles qu'il veut placer
-        List<Tile> maliste = player[current].getHand();
+        List<Tile> maliste = getCurrentPlayerHand();
 
         //roug, bleu, vert, mauve, orange , jaune
         for (int i = 0; i < is.length; i++) {
@@ -63,7 +63,7 @@ public class Game {
             Tile t = maliste.get(index);
             grid.add(row, col,t);
             player[current].remove(t);
-            nextPlayer();
+            pass();
         }catch (QwirkleException e){
             System.out.println(e.getMessage());
 
@@ -82,7 +82,7 @@ public class Game {
             }
             grid.add(row, col,d,tab);
             player[current].remove(tab);
-            nextPlayer();
+            pass();
         }catch(QwirkleException e){
             System.out.println(e.getMessage());
         }
@@ -111,7 +111,7 @@ public class Game {
             }
             player[current].remove(tab);
 
-            nextPlayer();
+            pass();
         }catch (QwirkleException e){
             System.out.println(e.getMessage());
         }
@@ -130,5 +130,6 @@ public class Game {
 
     public void pass(){
         current++;
+        current = current % player.length; //pour que si il depasse il revient au premier
     }
 }
