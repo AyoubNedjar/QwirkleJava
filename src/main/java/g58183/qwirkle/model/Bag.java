@@ -1,5 +1,6 @@
 package g58183.qwirkle.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -16,6 +17,7 @@ public class Bag {
     private Bag() {
         Shape[] formes = Shape.values();
         Color[] couleurs = Color.values();
+        tiles = new ArrayList<>();
 
         for (int i = 0; i < couleurs.length; i++) {
             for (int j = 0; j < formes.length; j++) {

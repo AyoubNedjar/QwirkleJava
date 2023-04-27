@@ -12,4 +12,7 @@ public class GridView {
     public boolean isEmpty(){
         return this.grid.isEmpty();
     }
+    public int getsize(){
+        return grid.getTiles().length;
+    }
 }

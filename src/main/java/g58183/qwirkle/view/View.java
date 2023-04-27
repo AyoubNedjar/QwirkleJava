@@ -1,6 +1,8 @@
 package g58183.qwirkle.view;
 
 import g58183.qwirkle.model.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public abstract class View {
 
@@ -10,14 +12,14 @@ public abstract class View {
     public static final String YELLOW = "\033[0;33m";
     public static final String BLUE = "\033[0;34m";
     public static final String PURPLE = "\033[0;35m";
-    public static final String ORANGE = "\033[0;43m";
+    public static final String ORANGE = "\033[38;2;204;85;0m";
 
 
 
     public static void display(GridView grid) {
-        int minX = 91;
+        int minX = grid.getsize();
         int maxX = 0;
-        int minY = 91;
+        int minY = grid.getsize();
         int maxY = 0;
 
 
@@ -35,8 +37,9 @@ public abstract class View {
             }
 
         }
+        System.out.println("--------------Le Plateau : -------------");
         for (int i = minX; i <= maxX; i++) {
-            System.out.println(" ");
+            System.out.print(i+" ");
             for (int j = minY; j <= maxY; j++) {
                 Tile tile = grid.get(i, j);
                 if (tile == null) {
@@ -47,7 +50,13 @@ public abstract class View {
             }
             System.out.println();
         }
+        System.out.print("    ");
+        for (int i = minY; i <= maxY; i++) {
+            System.out.print("" +i+ " ");
 
+        }
+        System.out.println();
+        System.out.println("--------------Le Plateau ---------------");
     }
 
     private static String tileToRepresentation(Tile tile) {
@@ -101,23 +110,41 @@ public abstract class View {
         return " ";
     }
 
-    public static void display(Player player) {
-        System.out.println(player.getNom());
+
+    public static void display(String nameplayer, List<Tile> playerHand){ // CHANGER ici
+
+        System.out.println("Joueur : " + nameplayer);
+        System.out.print("Main { : ");
+        for (Tile tile : playerHand) {
+            System.out.print(tileToRepresentation(tile));
+        }
+        System.out.println();
+        System.out.print("Index  :  ");
+
+        for (int i = 1; i < 7; i++) {
+            System.out.print(i+ "  ");
+        }
+        System.out.println();
+        System.out.println(">");
     }
 
+
     public static void displayHelp() {
-        String h = "Qwirkle command:\n"
-                + "play 1 tile : o <row> <col> <i>\n"
-                + " play line: l <row> <col> <direction> <i1> [<i2>]\n"
-                + "- play plic-ploc : m <row1> <col1> <i1> [<row2> <col2> <i2>]\n"
-                + "- play first : f <i1> [<i2>]\n"
-                + "- pass : p\n"
-                + "- quit : q\n"
-                + "i : index in list of tiles\n"
-                + " direction in l (left), r (right), u (up), d(down)\n";
+        String h = "Qwirkle command: choisissez ce que vous voulez jouer : \n"
+                + " -play 1 tile : o <row> <col> <i>\n"
+                + " -play line: l <row> <col> <direction> <i1> [<i2>]\n"
+                + " -play plic-ploc : m <row1> <col1> <i1> [<row2> <col2> <i2>]\n"
+                + " -play first : f <i1> [<i2>]\n"
+                + " -pass : p\n"
+                + " -quit : q\n"
+                + " -i : index in list of tiles\n"
+                + " -direction in l (left), r (right), u (up), d(down)\n" +
+                "Entrez votre choix : ";
+        System.out.println(h);
     }
 
     public static void displayError(String message) {
+        System.out.println(message);
     }
 
 }

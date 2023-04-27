@@ -21,14 +21,23 @@ public class Grid {
         return tiles;
     }
 
+    public boolean getEmpty() {
+        return isEmpty;
+    }
+
+    public void setEmpty(boolean empty) {
+        isEmpty = empty;
+    }
+
     /**
      * Cette methode va permettre de connaitre la tuile présente à une position
+     *
      * @param row
      * @param col
      * @return
      */
     public Tile get(int row, int col) {
-        if(row<0 || row>TAILLE || col<0 || col>TAILLE){
+        if (row < 0 || row > TAILLE || col < 0 || col > TAILLE) {
             return null;
         }
         return tiles[row][col];
@@ -41,8 +50,8 @@ public class Grid {
      * the game board (the first tile will be placed in 45.45)
      * varargs for divers tiles
      */
-    public void firstAdd(Direction d, Tile... line) throws QwirkleException{
-        if (!isEmpty()){
+    public void firstAdd(Direction d, Tile... line) throws QwirkleException {
+        if (!isEmpty()) {
             throw new QwirkleException("ce n'est pas le premier coup ");
         }
         int ligne = d.getDeltaRow();
@@ -89,103 +98,125 @@ public class Grid {
     }
 
 
-    public void add(int row, int col, Tile tile) {
-        //vérifier si la coordonnées sont correct
-        //vérifier si la case est vide
-        //vérifier que la ligne ne contient pas plus de 6 tuiles
-        //vérifier que la piece ajoutée a une ou des voisines
-        //vérifier la couleur ou la forme des lignes adjacentes et si la ligne de ne contient déja pas la meme tuile
-
-        if (row > 0 && row < TAILLE && col > 0 && col < TAILLE) {   //coordonnées
-            if (tiles[row][col] == null) {//si la case est vide
-                if (hasValidNeighbor(row,col,tile)) {//que la piece ajoutée a une ou des voisines
-                    if (isValidNbAndDoublon(row, col, tile,6)) { //vérification des 6 tuiles sur la mem ligne et pas de doublons
-
-                        tiles[row][col] = tile;
-                    } else {
-                        throw new QwirkleException("il y' a plus que 6 tuiles sur la même ligne");
-                    }
-                } else {
-                    throw new QwirkleException("voisins invalides");
-                }
-
-            } else {
-                throw new QwirkleException("Une tuile existe déja à cet emplacement");
-            }
-        } else {
-            throw new QwirkleException("la position ne se trouve pas sur le plateau ");
+    /**
+     * Adds a tile to the specified row and column if the position is valid and
+     * satisfies the game rules.
+     *
+     * @param row  the row of the tile
+     * @param col  the column of the tile
+     * @param tile the tile to add
+     * @throws QwirkleException if the position is invalid or does not satisfy
+     *                          the game rules
+     */
+    public void add(int row, int col, Tile tile) throws QwirkleException {
+        //vérifier si la coordonnée est correcte
+        if (row < 0 || row >= TAILLE || col < 0 || col >= TAILLE) {
+            throw new QwirkleException("La position ne se trouve pas sur le plateau.");
         }
 
+        //vérifier si la case est vide
+        if (tiles[row][col] != null) {
+            throw new QwirkleException("Une tuile existe déjà à cette position.");
+        }
+
+        //vérifier que la tuile a au moins un voisin valide
+        if (!hasValidNeighbor(row, col, tile)) {
+            throw new QwirkleException("La tuile n'a pas de voisin valide.");
+        }
+
+        //vérifier que la ligne ne contient pas plus de 6 tuiles et qu'il n'y a pas de doublon
+        if (!isValidNbAndDoublon(row, col, tile, 6)) {
+            throw new QwirkleException("La ligne contient déjà 6 tuiles ou la tuile créerait un doublon.");
+        }
+
+        tiles[row][col] = tile;
     }
 
-    //idée pour is valid: a chaque fois qu'on va placer une tuile on voit sa ligne et sa colone , pour la
-    //placée il faut que le truc commun (il faut voir le point en commun des deux premier élément de la liste) pour chaque direction
-    //si il a les deux point en commun il peut mettre la tuile
-
     /**
-     * Cette methode va permettre de comparer les couleurs ou les formes a appliquer sur la ligne
-     * en comparant les tuiles adjacentes
-     * @param t1
-     * @param t2
-     * @param t3
-     * @return
+     * This method allows to compare colors or shapes to be applied on the line
+     * by comparing adjacent tiles.
+     *
+     * @param t1 the first tile
+     * @param t2 the second tile
+     * @param t3 the third tile
+     * @return true if the color or shape of the tiles are valid, false otherwise.
      */
-    private boolean   isValidColorOrShape(Tile t1, Tile t2, Tile t3) {
+    private boolean isValidColorOrShape(Tile t1, Tile t2, Tile t3) {
         if (t2 == null) {
             return true;
         }
         if (t3 == null) {
-            return (t1.color() == t2.color()) || (t1.shape() == t2.shape()); //si
+            return (t1.color() == t2.color()) || (t1.shape() == t2.shape());
         }
         return (t1.color() == t2.color() && t1.color() == t3.color()) || (t1.shape() == t2.shape() && t1.shape() == t3.shape());
     }
 
-    private boolean hasNeighbor(int row, int col, Tile tile) {//va vérifier juste si la tuile a des voisins
-
-        if (tiles[row][col - 1] != null) { // Vérifier la case à gauche
+    /**
+     * This method will check if the given tile has any neighbors adjacent to it.
+     *
+     * @param row  the row coordinate of the tile
+     * @param col  the column coordinate of the tile
+     * @param tile the tile to check for neighbors
+     * @return true if the tile has at least one adjacent neighbor, false otherwise
+     */
+    private boolean hasNeighbor(int row, int col, Tile tile) {
+        if (tiles[row][col - 1] != null) {
             return true;
         }
-
-        if (tiles[row][col + 1] != null) { // Vérifier la case à droite
+        if (tiles[row][col + 1] != null) {
             return true;
         }
-        if (tiles[row - 1][col] != null) { // Vérifier la case en haut
+        if (tiles[row - 1][col] != null) {
             return true;
         }
-
-        if (tiles[row + 1][col] != null) { // Vérifier la case en bas
+        if (tiles[row + 1][col] != null) {
             return true;
         }
-
         return false;
     }
-    private boolean hasCorrectNeighbor(int row,int col, Tile tile){
 
-
-        return isValidColorOrShape(tile,get(row-1,col),get(row-2,col))//haut,
-                && isValidColorOrShape(tile,get(row,col+1),get(row,col+2))//droite
-                && isValidColorOrShape(tile,get(row+1,col),get(row+2,col))//bas
-                && isValidColorOrShape(tile,get(row,col-1),get(row,col-2));//gauche
-
+    /**
+     * This method checks whether a tile has correct neighboring tiles based on color or shape
+     *
+     * @param row  the row index of the tile
+     * @param col  the column index of the tile
+     * @param tile the tile to be checked
+     * @return true if the tile has correct neighboring tiles based on color or shape, false otherwise
+     */
+    private boolean hasCorrectNeighbor(int row, int col, Tile tile) {
+        return isValidColorOrShape(tile, get(row - 1, col), get(row - 2, col)) //up
+                && isValidColorOrShape(tile, get(row, col + 1), get(row, col + 2)) //right
+                && isValidColorOrShape(tile, get(row + 1, col), get(row + 2, col)) //down
+                && isValidColorOrShape(tile, get(row, col - 1), get(row, col - 2)); //left
     }
 
-    private boolean hasValidNeighbor(int row,int col, Tile tile){
-        return hasNeighbor(row ,col,tile) && hasCorrectNeighbor(row,col,tile);
+    /**
+     * This method checks if a given tile has a valid neighbor
+     * by calling the hasNeighbor() and hasCorrectNeighbor() methods.
+     *
+     * @param row  The row index of the tile
+     * @param col  The column index of the tile
+     * @param tile The tile to check for valid neighbors
+     * @return true if the tile has valid neighbors, false otherwise
+     */
+    private boolean hasValidNeighbor(int row, int col, Tile tile) {
+        return hasNeighbor(row, col, tile) && hasCorrectNeighbor(row, col, tile);
     }
 
 
     /**
-     * Cette methode va prendre une direction et vérifier si il n' y a pas plus 6 tuiles sur la meme ligne et si il n'y a pas la meme tuile et
-     * elle va faire de meme avec la direction opposée
-     * @param row
-     * @param col
-     * @param tile
-     * @param d
-     * @param max
-     * @return
+     * This method takes a direction and checks if there are no more than 6 tiles on the same line and
+     * if there is no duplicate tile, and it does the same thing with the opposite direction.
+     *
+     * @param row  the row of the tile
+     * @param col  the column of the tile
+     * @param tile the tile to check
+     * @param d    the direction to check
+     * @param max  the maximum number of tiles allowed on the same line
+     * @return true if there are no more than max tiles on the same line and no duplicate tile, false otherwise
+     * @throws QwirkleException if there is a duplicate tile on the same line
      */
-    private boolean isValidDoublonByAxe(int row, int col, Tile tile, Direction d , int max){
-
+    private boolean isValidDoublonByAxe(int row, int col, Tile tile, Direction d, int max) throws QwirkleException {
 
         int deltaRow = d.getDeltaRow();
         int deltaColumn = d.getDeltaColumn();
@@ -196,37 +227,32 @@ public class Grid {
         int deltaColumnOpposite = d.opposite().getDeltaColumn();
         int lgoposite = row;
         int clnoppiste = col;
-
         int cptdir1 = 0;
         int cptdir2 = 0;
-
-
         lg += deltaRow;
         cln += deltaColumn;
 
-        while (get(lg,cln) != null && cptdir1 < max) {
-
-            if(get(lg,cln).equals(tile)){//vérifie les doublons
-                throw new QwirkleException("on ne peut pas avoir la meme tuiole sur la meme ligne");
+        while (get(lg, cln) != null && cptdir1 < max) {
+            if (get(lg, cln).equals(tile)) { // check for duplicates
+                throw new QwirkleException("On ne peut pas avoir la meme tuile sur la meme ligne");
             }
             cptdir1++;
             lg += deltaRow;
             cln += deltaColumn;
         }
 
-        lgoposite  += deltaRowOpposite;
+        lgoposite += deltaRowOpposite;
         clnoppiste += deltaColumnOpposite;
 
-        while ( get(lgoposite,clnoppiste) != null && cptdir2 < max) {
-
-            if(get(lgoposite,clnoppiste).equals(tile)){//vérifie les doublons
-                throw new QwirkleException("on ne peut pas avoir la meme tuiole sur la meme ligne");
+        while (get(lgoposite, clnoppiste) != null && cptdir2 < max) {
+            if (get(lgoposite, clnoppiste).equals(tile)) { // check for duplicates
+                throw new QwirkleException("On ne peut pas avoir la meme tuile sur la meme ligne");
             }
             cptdir2++;
-            lgoposite  += deltaRowOpposite;
+            lgoposite += deltaRowOpposite;
             clnoppiste += deltaColumnOpposite;
-
         }
+
         if ((cptdir1 + cptdir2) >= max) {
             return false;
         }
@@ -235,25 +261,28 @@ public class Grid {
 
 
     /**
-     * Cette methode va vérifier si il n'y a pas de doublons sur la meme ligne et qu'on ne dépasse *
-     * pas les 6 tuiles max et ceci dans toutes les direction
-     * @param row
-     * @param col
-     * @param tile
-     * @param max
-     * @return
+     * This method checks if there are no duplicates on the same line and if we do not exceed the maximum
+     * of 6 tiles in all directions.
+     *
+     * @param row  the row index of the tile being placed
+     * @param col  the column index of the tile being placed
+     * @param tile the tile being placed
+     * @param max  the maximum number of tiles allowed on a line
+     * @return true if there are no duplicates and the maximum number of tiles has not been exceeded, false otherwise
      */
-    private boolean isValidNbAndDoublon(int row, int col, Tile tile, int max){
-        return isValidDoublonByAxe(row, col, tile, Direction.UP, max) && isValidDoublonByAxe(row, col, tile, Direction.RIGHT, max);
+    private boolean isValidNbAndDoublon(int row, int col, Tile tile, int max) {
+        return isValidDoublonByAxe(row, col, tile, Direction.UP, max)
+                && isValidDoublonByAxe(row, col, tile, Direction.RIGHT, max);
     }
 
 
     /**
-     * Cette methode va permettre de placer plusieurs tuiles à la suite dans une direction donnée
-     * @param row
-     * @param col
-     * @param d
-     * @param line
+     * This method allows to place multiple tiles consecutively in a given direction
+     *
+     * @param row  the row where to start placing the tiles
+     * @param col  the column where to start placing the tiles
+     * @param d    the direction in which to place the tiles
+     * @param line the tiles to be placed
      */
     public void add(int row, int col, Direction d, Tile... line) {
 
@@ -271,68 +300,118 @@ public class Grid {
             lg += deltaRow;
             cln += deltaColumn;
         }
-
-
     }
 
     /**
-     * Cette methode va permettre de placer plusieurs tuiles pas à la suite des autres
-     * mais va s'assurer que le joueur les places sur la même ligne ou la meme colonne
-     * @param tile
+     * This method allows to place multiple tiles not consecutively
+     * but will ensure that the player places them on the same row or column
+     *
+     * @param tile the tiles to be placed
+     * @throws QwirkleException if the tiles are not on the same row or column
      */
-    public void add(TileAtPosition... tile) {
-        List<TileAtPosition> maliste = new ArrayList<>();
+    public void add(TileAtPosition... tile) throws QwirkleException {
+        List<TileAtPosition> maliste = Arrays.stream(tile).toList();
 
         try {
-            if(sameRowOrCol(tile)){
-                for (TileAtPosition t :tile) {
-                    add(t.row(), t.col(), t.tile());
-                    maliste.add(t);
-                }
-            }else {
-                throw new QwirkleException("pas meme ligne ou col");
+            if (sameRowOrCol(tile)) {
+                placeTilesforthirdAdd(tile);
+            } else {
+                throw new QwirkleException("Pas la même ligne ou colonne");
             }
 
-        }catch(QwirkleException e){
-            maliste.stream().forEach(t->tiles[t.row()][t.col()] = null);//remettre à null les tuiles mises auparavant
+        } catch (QwirkleException e) {
+            maliste.stream().forEach(t -> tiles[t.row()][t.col()] = null);//reset previously placed tiles to null
             System.out.println(e.getMessage());
+            throw e;
+        } finally {
 
         }
     }
 
-    /**
-     * Cette methode va s'occuper de mettre comparer la ligne ou la colonne de toutes les pieces données en paramètre
-     * utilisation de stream avec le filtre (compter le nombre de tuiles qui respectent la condition)
-     * @param tile le nombres de tuiles à mettre
-     * @return un boolean qui vérifie si la nombre de tuiles est le meme que celles qui respectent la condition
-     */
-    private boolean sameRowOrCol(TileAtPosition... tile){
-        int row = tile[0].row();
-        int col = tile[0].col();
-        Long  a = Arrays.stream(tile).filter(t->t.col()==col).count();
-        Long b = Arrays.stream(tile).filter(t->t.row()==row).count();
+    private void placeTilesforthirdAdd(TileAtPosition... tile) {
+        List<TileAtPosition> maliste = Arrays.stream(tile).toList();
+        int cpt = 1;
 
-        return a==tile.length || b==tile.length;
+        if (!caseVides(tile)) {//si les cases ne sont pas  vides
+            throw new QwirkleException("Il y'a déjà des tuiles à ces emplacement");
+        }
+        if (!isInBoard(tile)) {
+            throw new QwirkleException("La position ne se trouve pas sur le plateau.");
+        }
+
+        maliste.stream().forEach(t -> tiles[t.row()][t.col()] = t.tile());//mettre toute les tuiles sur le plateau
+
+        for (TileAtPosition t : tile) {
+            if (!hasValidNeighbor(t.row(), t.col(), t.tile())) {
+                throw new QwirkleException("La tuile numéro " + cpt + " n'as pas de voisin valide.");
+            }
+            cpt++;
+        }
+
+        for (TileAtPosition t : tile) {
+            if (!isValidNbAndDoublon(t.row(), t.col(), t.tile(), 6)) {
+                throw new QwirkleException(" Il y'a un doublon dans la ligne");
+            }
+        }
+
     }
 
+    private boolean isInBoard(TileAtPosition... tile) {
+        int row = 0;
+        int col = 0;
+
+        for (int i = 0; i < tile.length; i++) {
+            row = tile[i].row();
+            col = tile[i].col();
+            if (row < 0 || row >= TAILLE || col < 0 || col >= TAILLE) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean caseVides(TileAtPosition... tile) {
+        for (TileAtPosition t : tile) {
+            if (tiles[t.row()][t.col()] != null) {
+                return false;
+            }
+        }
+        return true;
+    }
 
     /**
-     * Cette methode permet de nous dire si la grille est vide ou pas
-     * @return
+     * This method will compare the row or column of all the tiles passed as parameter
+     * <p>
+     * using stream with filter (count the number of tiles that meet the condition)
+     *
+     * @param tile the tiles to be placed
+     * @return a boolean that checks if the number of tiles is the same as those that meet the condition
+     */
+    private boolean sameRowOrCol(TileAtPosition... tile) {
+        int row = tile[0].row();
+        int col = tile[0].col();
+        long a = Arrays.stream(tile).filter(t -> t.col() == col).count();
+        long b = Arrays.stream(tile).filter(t -> t.row() == row).count();
+
+        return a == tile.length || b == tile.length;
+    }
+
+    /**
+     * This method allows us to know if the grid is empty or not
+     *
+     * @return a boolean indicating whether the grid is empty or not
      */
     public boolean isEmpty() {
-
         for (int i = 0; i < tiles.length; i++) {
             for (int j = 0; j < tiles[i].length; j++) {
-
                 if (tiles[i][j] != null) {
-
                     return false;
                 }
             }
         }
         return true;
     }
+
 
 }
 

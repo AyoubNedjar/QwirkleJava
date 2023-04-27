@@ -1,5 +1,6 @@
 package g58183.qwirkle.model;
 
+import g58183.qwirkle.view.View;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,9 +15,13 @@ class GridTest {
 
     private Grid grid;
 
+    //Pour afficher la grid c'est plus simple pour comprendre les erreurs
+    private GridView gridView;
+
     @BeforeEach
     void setUp() {
         grid = new Grid();
+        gridView = new GridView(grid);
     }
 
     @Test
@@ -24,6 +29,17 @@ class GridTest {
         var tile = new Tile(BLUE, CROSS);
         grid.firstAdd(RIGHT, tile);
         assertSame(get(grid, 0, 0), tile);
+    }
+
+    @Test
+    public void add_Position_At_Row_Equal_Zero() {
+        Tile tile2 = new Tile(RED, CROSS);
+        grid.firstAdd(UP, tile2);
+        Tile tile3 = new Tile(RED, CROSS);
+
+        View.display(gridView);
+        assertThrows(QwirkleException.class, () -> add(grid, 0, 1, tile3));
+
     }
 
     @Test
@@ -35,29 +51,6 @@ class GridTest {
         assertEquals(t1, get(grid, 0, 0));
         assertEquals(t2, get(grid, -1, 0));
         assertEquals(t3, get(grid, -2, 0));
-    }
-
-    @Test
-    void differentColorSameShape() {
-        var t1 = new Tile(RED, SQUARE);
-        var t2 = new Tile(BLUE, SQUARE);
-        var t3 = new Tile(GREEN, SQUARE);
-        grid.firstAdd(UP, t1, t2, t3);
-        assertEquals(t1, get(grid, 0, 0));
-        assertEquals(t2, get(grid, -1, 0));
-        assertEquals(t3, get(grid, -2, 0));
-    }
-
-
-    @Test
-    void differentColorAndShape() {
-        var t1 = new Tile(RED, SQUARE);
-        var t3 = new Tile(GREEN, DIAMOND);
-        var t2 = new Tile(BLUE, ROUND);
-
-        assertThrows(QwirkleException.class, () -> {
-            grid.firstAdd(RIGHT, t1, t2, t3);
-        });
     }
 
     @Test
@@ -74,7 +67,1196 @@ class GridTest {
     }
 
     @Test
-    void firstAdd_cannot_be_called_twice() {
+    void rules_cedric_b() {
+        var t1 = new Tile(RED, ROUND);
+        var t2 = new Tile(RED, DIAMOND);
+        var t3 = new Tile(RED, PLUS);
+        grid.firstAdd(UP, t1, t2, t3);
+
+        var t4 = new Tile(RED, SQUARE);
+        var t5 = new Tile(BLUE, SQUARE);
+        var t6 = new Tile(PURPLE, SQUARE);
+        grid.add(46, 45, RIGHT, t4, t5, t6);
+
+        assertEquals(t4, get(grid, 1, 0));
+        assertEquals(t5, get(grid, 1, 1));
+        assertEquals(t6, get(grid, 1, 2));
+
+    }
+
+    @Test
+    void rules_cedric_b_fail() {
+        var t1 = new Tile(RED, ROUND);
+        var t2 = new Tile(RED, DIAMOND);
+        var t3 = new Tile(RED, PLUS);
+        grid.firstAdd(UP, t1, t2, t3);
+
+        var t4 = new Tile(RED, SQUARE);
+        var t5 = new Tile(BLUE, SQUARE);
+        var t6 = new Tile(PURPLE, SQUARE);
+        grid.add(46, 45, RIGHT, t4, t5, t6);
+
+        var t7 = new Tile(YELLOW, SQUARE);
+        var t8 = new Tile(YELLOW, STAR);
+        var t9 = new Tile(YELLOW, ROUND);
+        assertThrows(QwirkleException.class, ()->grid.add(46, 48, RIGHT, t7, t8, t9));
+    }
+    @Test
+    void rules_cedric_b_fail_2() {
+        var t1 = new Tile(RED, ROUND);
+        var t2 = new Tile(RED, DIAMOND);
+        var t3 = new Tile(RED, PLUS);
+        grid.firstAdd(UP, t1, t2, t3);
+
+        var t4 = new Tile(RED, SQUARE);
+        var t5 = new Tile(BLUE, SQUARE);
+        var t6 = new Tile(PURPLE, SQUARE);
+        grid.add(46, 45, RIGHT, t4, t5, t6);
+
+        var t7 = new Tile(YELLOW, SQUARE);
+        var t8 = new Tile(YELLOW, STAR);
+        var t9 = new Tile(PURPLE, ROUND);
+        assertThrows(QwirkleException.class, ()->grid.add(46, 48, RIGHT, t7, t8, t9));
+    }
+
+    @Test
+    void rules_cedric_b_insert_between_lines() {
+        var t1 = new Tile(RED, ROUND);
+        var t2 = new Tile(RED, DIAMOND);
+        var t3 = new Tile(RED, PLUS);
+        grid.firstAdd(UP, t1, t2, t3);
+
+        var t4 = new Tile(RED, SQUARE);
+        var t5 = new Tile(BLUE, SQUARE);
+        var t6 = new Tile(PURPLE, SQUARE);
+        grid.add(46, 45, RIGHT, t4, t5, t6);
+
+        var t7 = new Tile(PURPLE, ROUND);
+        var t8 = new Tile(PURPLE, DIAMOND);
+        var t9 = new Tile(PURPLE, PLUS);
+        grid.add(45, 47, UP, t7, t8, t9);
+
+        var t10 = new Tile(BLUE, ROUND);
+        var t11 = new Tile(BLUE, DIAMOND);
+        var t12 = new Tile(BLUE, PLUS);
+        grid.add(45, 46, UP, t10, t11, t12);
+    }
+
+    @Test
+    void rules_cedric_b_adapted_to_fail() {
+        var t1 = new Tile(RED, ROUND);
+        var t2 = new Tile(RED, DIAMOND);
+        var t3 = new Tile(RED, PLUS);
+        grid.firstAdd(UP, t1, t2, t3);
+
+        var t4 = new Tile(RED, SQUARE);
+        var t5 = new Tile(BLUE, SQUARE);
+        var t6 = new Tile(BLUE, SQUARE);
+        assertThrows(QwirkleException.class, () -> {
+            grid.firstAdd(RIGHT, t4, t5, t6);
+
+        });
+
+    }
+    @Test
+    void rules_Elvire_c_adapted_fail() {
+        var t1 = new Tile(RED, ROUND);
+        var t2 = new Tile(RED, DIAMOND);
+        var t3 = new Tile(RED, PLUS);
+        grid.firstAdd(UP, t1, t2, t3);
+        var t4 = new Tile(RED, SQUARE);
+        var t5 = new Tile(BLUE, SQUARE);
+        var t6 = new Tile(PURPLE, SQUARE);
+        grid.add(46, 45, RIGHT, t4, t5, t6);
+        var t7 = new Tile(BLUE, ROUND);
+        assertThrows(QwirkleException.class, () -> {
+            grid.add(45, 47, t7);
+
+        });
+    }
+
+    @Test
+    void rules_elvire_c_adapted() {
+        var t1 = new Tile(RED, ROUND);
+        var t2 = new Tile(RED, DIAMOND);
+        var t3 = new Tile(RED, PLUS);
+        grid.firstAdd(UP, t1, t2, t3);
+
+        var t4 = new Tile(RED, SQUARE);
+        var t5 = new Tile(BLUE, SQUARE);
+        var t6 = new Tile(PURPLE, SQUARE);
+        grid.add(46, 45, RIGHT, t4, t5, t6);
+        var t7 = new Tile(BLUE, ROUND);
+        grid.add(45, 46, t7);
+
+        assertEquals(t7, get(grid, 0, 1));
+    }
+
+    @Test
+    void rules_vincent_d_adapted() {
+        var t1 = new Tile(RED, ROUND);
+        var t2 = new Tile(RED, DIAMOND);
+        var t3 = new Tile(RED, PLUS);
+        grid.firstAdd(UP, t1, t2, t3);
+
+        var t4 = new Tile(RED, SQUARE);
+        var t5 = new Tile(BLUE, SQUARE);
+        var t6 = new Tile(PURPLE, SQUARE);
+        grid.add(46, 45, RIGHT, t4, t5, t6);
+
+        var t7 = new Tile(BLUE, ROUND);
+        grid.add(45, 46, t7);
+
+        var t8 = new Tile(GREEN, PLUS);
+        var t9 = new Tile(GREEN, DIAMOND);
+        grid.add(43, 44, DOWN, t8, t9);
+
+        assertEquals(t8, get(grid, -2, -1));
+        assertEquals(t9, get(grid, -1, -1));
+    }
+
+    @Test
+    void rules_vincent_d_adapted_fail() {
+        var t1 = new Tile(RED, ROUND);
+        var t2 = new Tile(RED, DIAMOND);
+        var t3 = new Tile(RED, PLUS);
+        grid.firstAdd(UP, t1, t2, t3);
+
+        var t4 = new Tile(RED, SQUARE);
+        var t5 = new Tile(BLUE, SQUARE);
+        var t6 = new Tile(PURPLE, SQUARE);
+        grid.add(46, 45, RIGHT, t4, t5, t6);
+
+        var t7 = new Tile(BLUE, ROUND);
+        grid.add(45, 46, t7);
+
+        var t8 = new Tile(GREEN, PLUS);
+        var t9 = new Tile(GREEN, DIAMOND);
+        assertThrows(QwirkleException.class, () -> {
+            grid.add(46, 43, LEFT, t8, t9);
+        });
+
+    }
+
+    @Test
+    void rules_sonia_e_adapted() {
+        var t1 = new Tile(RED, ROUND);
+        var t2 = new Tile(RED, DIAMOND);
+        var t3 = new Tile(RED, PLUS);
+        grid.firstAdd(UP, t1, t2, t3);
+
+        var t4 = new Tile(RED, SQUARE);
+        var t5 = new Tile(BLUE, SQUARE);
+        var t6 = new Tile(PURPLE, SQUARE);
+        grid.add(46, 45, RIGHT, t4, t5, t6);
+
+        var t7 = new Tile(BLUE, ROUND);
+        grid.add(45, 46, t7);
+
+        var t8 = new Tile(GREEN, DIAMOND);
+        var t9 = new Tile(GREEN, PLUS);
+        grid.add(44, 44, UP, t8, t9);
+
+        var t10 = new Tile(GREEN, ROUND);
+        var t11 = new Tile(GREEN, STAR);
+        grid.add(new TileAtPosition(45, 44, t10), new TileAtPosition(42, 44, t11));
+
+        assertEquals(t10, get(grid,0,-1 ));
+        assertEquals(t11, get(grid,-3,-1 ));
+    }
+
+    @Test
+    void rules_sonia_e_adapted_to_fail() {
+        var t1 = new Tile(RED, ROUND);
+        var t2 = new Tile(RED, DIAMOND);
+        var t3 = new Tile(RED, PLUS);
+        grid.firstAdd(UP, t1, t2, t3);
+        var t4 = new Tile(RED, SQUARE);
+        var t5 = new Tile(BLUE, SQUARE);
+        var t6 = new Tile(PURPLE, SQUARE);
+        grid.add(46, 45, RIGHT, t4, t5, t6);
+        var t7 = new Tile(BLUE, ROUND);
+        grid.add(45, 46, t7);
+        var t8 = new Tile(GREEN, DIAMOND);
+        var t9 = new Tile(GREEN, PLUS);
+        grid.add(44, 44, UP, t8, t9);
+        var t10 = new Tile(GREEN, ROUND);
+        var t11 = new Tile(GREEN, STAR);
+        assertThrows(QwirkleException.class, () -> {
+            grid.add(new TileAtPosition(44, 44, t10),new TileAtPosition(42,45,t11));
+        });
+        assertNull(grid.get(5,6));
+        assertNull(grid.get(7,9));
+    }
+    @Test
+    void rules_sonia_e_adapted_to_fail_2() {
+        var t1 = new Tile(RED, ROUND);
+        var t2 = new Tile(RED, DIAMOND);
+        var t3 = new Tile(RED, PLUS);
+        grid.firstAdd(UP, t1, t2, t3);
+        var t4 = new Tile(RED, SQUARE);
+        var t5 = new Tile(BLUE, SQUARE);
+        var t6 = new Tile(PURPLE, SQUARE);
+        grid.add(46, 45, RIGHT, t4, t5, t6);
+        var t7 = new Tile(BLUE, ROUND);
+        grid.add(45, 46, t7);
+        var t8 = new Tile(GREEN, DIAMOND);
+        var t9 = new Tile(GREEN, PLUS);
+        grid.add(44, 44, UP, t8, t9);
+        var t10 = new Tile(GREEN, ROUND);
+        var t11 = new Tile(GREEN, DIAMOND);
+
+
+        View.display(gridView);
+        assertThrows(QwirkleException.class, () -> {
+            grid.add(new TileAtPosition(45, 44, t10),new TileAtPosition(42,44,t11));
+
+        });
+
+        assertNull(grid.get(5,6));
+        assertNull(grid.get(7,9));
+    }
+    @Test
+    void rules_cedric_f_adapted() {
+        var t1 = new Tile(RED, ROUND);
+        var t2 = new Tile(RED, DIAMOND);
+        var t3 = new Tile(RED, PLUS);
+        grid.firstAdd(UP, t1, t2, t3);
+        var t4 = new Tile(RED, SQUARE);
+        var t5 = new Tile(BLUE, SQUARE);
+        var t6 = new Tile(PURPLE, SQUARE);
+        grid.add(46, 45, RIGHT, t4, t5, t6);
+        var t7 = new Tile(BLUE, ROUND);
+        grid.add(45, 46, t7);
+        var t8 = new Tile(GREEN, DIAMOND);
+        var t9 = new Tile(GREEN, PLUS);
+        grid.add(44, 44, UP, t8, t9);
+        var t10 = new Tile(GREEN, ROUND);
+        var t11 = new Tile(GREEN, STAR);
+        grid.add(new TileAtPosition(45, 44, t10), new TileAtPosition(42, 44, t11));
+        var t12 = new Tile(RED, SQUARE);
+        var t13 = new Tile(ORANGE, SQUARE);
+        grid.add(new TileAtPosition(46, 48, t13), new TileAtPosition(47, 48, t12));
+
+    }
+
+    @Test
+    void rules_cedric_f_adapted_to_fail() {
+        var t1 = new Tile(RED, ROUND);
+        var t2 = new Tile(RED, DIAMOND);
+        var t3 = new Tile(RED, PLUS);
+        grid.firstAdd(UP, t1, t2, t3);
+
+        var t4 = new Tile(RED, SQUARE);
+        var t5 = new Tile(BLUE, SQUARE);
+        var t6 = new Tile(PURPLE, SQUARE);
+        grid.add(46, 45, RIGHT, t4, t5, t6);
+
+        var t7 = new Tile(BLUE, ROUND);
+        grid.add(45, 46, t7);
+
+        var t8 = new Tile(GREEN, DIAMOND);
+        var t9 = new Tile(GREEN, PLUS);
+        grid.add(44, 44, UP, t8, t9);
+
+        var t10 = new Tile(GREEN, ROUND);
+        var t11 = new Tile(GREEN, STAR);
+        grid.add(new TileAtPosition(45, 44, t10), new TileAtPosition(42, 44, t11));
+
+        View.display(gridView);
+        assertThrows(QwirkleException.class, () -> {
+            grid.add(new TileAtPosition(46, 48, t10), new TileAtPosition(47, 48, t11));
+        });
+
+    }
+    @Test
+    void rules_cedric_f_adapted_to_fail_2() {
+        var t1 = new Tile(RED, ROUND);
+        var t2 = new Tile(RED, DIAMOND);
+        var t3 = new Tile(RED, PLUS);
+        grid.firstAdd(UP, t1, t2, t3);
+
+        var t4 = new Tile(RED, SQUARE);
+        var t5 = new Tile(BLUE, SQUARE);
+        var t6 = new Tile(PURPLE, SQUARE);
+        grid.add(46, 45, RIGHT, t4, t5, t6);
+
+        var t7 = new Tile(BLUE, ROUND);
+        grid.add(45, 46, t7);
+
+        var t8 = new Tile(GREEN, DIAMOND);
+        var t9 = new Tile(GREEN, PLUS);
+        grid.add(44, 44, UP, t8, t9);
+
+        var t10 = new Tile(GREEN, ROUND);
+        var t11 = new Tile(YELLOW, STAR);
+
+
+        assertThrows(QwirkleException.class, () -> {
+            grid.add(new TileAtPosition(46, 48, t10), new TileAtPosition(47, 48, t11));
+        });
+
+    }
+    @Test
+    void rules_elvire_g_adapted(){
+        var t1 = new Tile(RED, ROUND);
+        var t2 = new Tile(RED, DIAMOND);
+        var t3 = new Tile(RED, PLUS);
+        grid.firstAdd(UP, t1, t2, t3);
+
+        var t4 = new Tile(RED, SQUARE);
+        var t5 = new Tile(BLUE, SQUARE);
+        var t6 = new Tile(PURPLE, SQUARE);
+        grid.add(46, 45, RIGHT, t4, t5, t6);
+
+        var t7 = new Tile(BLUE, ROUND);
+        grid.add(45, 46, t7);
+
+        var t8 = new Tile(GREEN, DIAMOND);
+        var t9 = new Tile(GREEN, PLUS);
+        grid.add(44, 44, UP, t8, t9);
+
+        var t10 = new Tile(GREEN, ROUND);
+        var t11 = new Tile(GREEN, STAR);
+        grid.add(new TileAtPosition(45, 44, t10), new TileAtPosition(42, 44, t11));
+
+        var t12 = new Tile(RED, SQUARE);
+        var t13 = new Tile(ORANGE, SQUARE);
+        grid.add(new TileAtPosition(46, 48, t13), new TileAtPosition(47, 48, t12));
+
+        var t14 = new Tile(YELLOW,STAR);
+        var t15 = new Tile(ORANGE,STAR);
+        grid.add(42,43,LEFT,t14,t15 );
+
+        assertEquals(t14,get(grid,-3,-2));
+        assertEquals(t15,get(grid,-3,-3));
+    }
+    @Test
+    void rules_elvire_g_adapted_to_fail(){
+        var t1 = new Tile(RED, ROUND);
+        var t2 = new Tile(RED, DIAMOND);
+        var t3 = new Tile(RED, PLUS);
+        grid.firstAdd(UP, t1, t2, t3);
+
+        var t4 = new Tile(RED, SQUARE);
+        var t5 = new Tile(BLUE, SQUARE);
+        var t6 = new Tile(PURPLE, SQUARE);
+        grid.add(46, 45, RIGHT, t4, t5, t6);
+        ;
+        var t7 = new Tile(BLUE, ROUND);
+        grid.add(45, 46, t7);
+
+        var t8 = new Tile(GREEN, DIAMOND);
+        var t9 = new Tile(GREEN, PLUS);
+        grid.add(44, 44, UP, t8, t9);
+
+        var t10 = new Tile(GREEN, ROUND);
+        var t11 = new Tile(GREEN, STAR);
+        grid.add(new TileAtPosition(45, 44, t10), new TileAtPosition(42, 44, t11));
+
+        var t12 = new Tile(RED, SQUARE);
+        var t13 = new Tile(ORANGE, SQUARE);
+        grid.add(new TileAtPosition(46, 48, t13), new TileAtPosition(47, 48, t12));
+
+        var t14 = new Tile(YELLOW,STAR);
+        var t15 = new Tile(YELLOW,DIAMOND);
+        assertThrows(QwirkleException.class, () -> {
+            grid.add(45, 43, LEFT, t14, t15);
+
+        });
+        assertNull(grid.get(0,3));
+        assertNull(grid.get(0,3));
+    }
+    @Test
+    void rules_elvire_g_adapted_to_fail_2(){
+        var t1 = new Tile(RED, ROUND);
+        var t2 = new Tile(RED, DIAMOND);
+        var t3 = new Tile(RED, PLUS);
+        grid.firstAdd(UP, t1, t2, t3);
+
+        var t4 = new Tile(RED, SQUARE);
+        var t5 = new Tile(BLUE, SQUARE);
+        var t6 = new Tile(PURPLE, SQUARE);
+        grid.add(46, 45, RIGHT, t4, t5, t6);
+        ;
+        var t7 = new Tile(BLUE, ROUND);
+        grid.add(45, 46, t7);
+
+        var t8 = new Tile(GREEN, DIAMOND);
+        var t9 = new Tile(GREEN, PLUS);
+        grid.add(44, 44, UP, t8, t9);
+
+        var t10 = new Tile(GREEN, ROUND);
+        var t11 = new Tile(GREEN, STAR);
+        grid.add(new TileAtPosition(45, 44, t10), new TileAtPosition(42, 44, t11));
+
+        var t12 = new Tile(RED, SQUARE);
+        var t13 = new Tile(ORANGE, SQUARE);
+        grid.add(new TileAtPosition(46, 48, t13), new TileAtPosition(47, 48, t12));
+
+        var t14 = new Tile(YELLOW,STAR);
+        var t15 = new Tile(YELLOW,DIAMOND);
+        assertThrows(QwirkleException.class, () -> {
+            grid.add(46, 43, LEFT, t14, t15);
+
+        });
+        assertNull(grid.get(0,3));
+        assertNull(grid.get(0,3));
+    }
+    @Test
+    void rules_elvire_g_adapted_to_fail_1(){
+        var t1 = new Tile(RED, ROUND);
+        var t2 = new Tile(RED, DIAMOND);
+        var t3 = new Tile(RED, PLUS);
+        grid.firstAdd(UP, t1, t2, t3);
+
+        var t4 = new Tile(RED, SQUARE);
+        var t5 = new Tile(BLUE, SQUARE);
+        var t6 = new Tile(PURPLE, SQUARE);
+        grid.add(46, 45, RIGHT, t4, t5, t6);
+
+        var t7 = new Tile(BLUE, ROUND);
+        grid.add(45, 46, t7);
+
+        var t8 = new Tile(GREEN, DIAMOND);
+        var t9 = new Tile(GREEN, PLUS);
+        grid.add(44, 44, UP, t8, t9);
+
+        var t10 = new Tile(GREEN, ROUND);
+        var t11 = new Tile(GREEN, STAR);
+        grid.add(new TileAtPosition(45, 44, t10), new TileAtPosition(42, 44, t11));
+        var t12 = new Tile(RED, SQUARE);
+        var t13 = new Tile(ORANGE, SQUARE);
+        grid.add(new TileAtPosition(46, 48, t13), new TileAtPosition(47, 48, t12));
+        var t14 = new Tile(YELLOW,STAR);
+        var t15 = new Tile(YELLOW,PLUS);
+        assertThrows(QwirkleException.class, () -> {
+            grid.add(46, 43, LEFT, t14, t15);
+
+        });
+        assertNull(grid.get(2,3));
+        assertNull(grid.get(1,3));
+    }
+    @Test
+    void rules_vincent_h_adapted(){
+        var t1 = new Tile(RED, ROUND);
+        var t2 = new Tile(RED, DIAMOND);
+        var t3 = new Tile(RED, PLUS);
+        grid.firstAdd(UP, t1, t2, t3);
+
+        var t4 = new Tile(RED, SQUARE);
+        var t5 = new Tile(BLUE, SQUARE);
+        var t6 = new Tile(PURPLE, SQUARE);
+        grid.add(46, 45, RIGHT, t4, t5, t6);
+
+        var t7 = new Tile(BLUE, ROUND);
+        grid.add(45, 46, t7);
+
+        var t8 = new Tile(GREEN, DIAMOND);
+        var t9 = new Tile(GREEN, PLUS);
+        grid.add(44, 44, UP, t8, t9);
+
+        var t10 = new Tile(GREEN, ROUND);
+        var t11 = new Tile(GREEN, STAR);
+        grid.add(new TileAtPosition(45, 44, t10), new TileAtPosition(42, 44, t11));
+        var t12 = new Tile(RED, SQUARE);
+        var t13 = new Tile(ORANGE, SQUARE);
+        grid.add(new TileAtPosition(46, 48, t13), new TileAtPosition(47, 48, t12));
+        var t14 = new Tile(YELLOW,STAR);
+        var t15 = new Tile(ORANGE,STAR);
+        grid.add(42,43,LEFT,t14,t15 );
+
+        var t16 = new Tile(ORANGE, CROSS);
+        var t17 = new Tile(ORANGE, DIAMOND);
+        grid.add( 43,42,DOWN, t16, t17);
+
+        assertEquals(t16, get(grid,-2,-3));
+        assertEquals(t17, get(grid,-1,-3));
+    }
+    @Test
+    void rules_vincent_h_adapted_to_fail() {
+        var t1 = new Tile(RED, ROUND);
+        var t2 = new Tile(RED, DIAMOND);
+        var t3 = new Tile(RED, PLUS);
+        grid.firstAdd(UP, t1, t2, t3);
+
+        var t4 = new Tile(RED, SQUARE);
+        var t5 = new Tile(BLUE, SQUARE);
+        var t6 = new Tile(PURPLE, SQUARE);
+        grid.add(46, 45, RIGHT, t4, t5, t6);
+
+        var t7 = new Tile(BLUE, ROUND);
+        grid.add(45, 46, t7);
+
+        var t8 = new Tile(GREEN, DIAMOND);
+        var t9 = new Tile(GREEN, PLUS);
+        grid.add(44, 44, UP, t8, t9);
+
+        var t10 = new Tile(GREEN, ROUND);
+        var t11 = new Tile(GREEN, STAR);
+        grid.add(new TileAtPosition(45, 44, t10), new TileAtPosition(42, 44, t11));
+        var t12 = new Tile(RED, SQUARE);
+        var t13 = new Tile(ORANGE, SQUARE);
+        grid.add(new TileAtPosition(46, 48, t13), new TileAtPosition(47, 48, t12));
+        var t14 = new Tile(YELLOW, STAR);
+        var t15 = new Tile(ORANGE, STAR);
+        grid.add(42, 43, LEFT, t14, t15);
+
+        var t16 = new Tile(ORANGE, CROSS);
+        var t17 = new Tile(ORANGE, DIAMOND);
+        grid.add(43, 42, DOWN, t16, t17);
+
+        assertThrows(QwirkleException.class, () -> {
+            grid.add(46, 43, LEFT, t16, t17);
+
+        });
+        assertNull(grid.get(2, 3));
+        assertNull(grid.get(1, 3));
+    }
+    @Test
+    void rules_vincent_h_adapted_to_fail_2() {
+        var t1 = new Tile(RED, ROUND);
+        var t2 = new Tile(RED, DIAMOND);
+        var t3 = new Tile(RED, PLUS);
+        grid.firstAdd(UP, t1, t2, t3);
+
+        var t4 = new Tile(RED, SQUARE);
+        var t5 = new Tile(BLUE, SQUARE);
+        var t6 = new Tile(PURPLE, SQUARE);
+        grid.add(46, 45, RIGHT, t4, t5, t6);
+
+        var t7 = new Tile(BLUE, ROUND);
+        grid.add(45, 46, t7);
+
+        var t8 = new Tile(GREEN, DIAMOND);
+        var t9 = new Tile(GREEN, PLUS);
+        grid.add(44, 44, UP, t8, t9);
+
+        var t10 = new Tile(GREEN, ROUND);
+        var t11 = new Tile(GREEN, STAR);
+        grid.add(new TileAtPosition(45, 44, t10), new TileAtPosition(42, 44, t11));
+        var t12 = new Tile(RED, SQUARE);
+        var t13 = new Tile(ORANGE, SQUARE);
+        grid.add(new TileAtPosition(46, 48, t13), new TileAtPosition(47, 48, t12));
+        var t14 = new Tile(YELLOW, STAR);
+        var t15 = new Tile(ORANGE, STAR);
+        grid.add(42, 43, LEFT, t14, t15);
+
+        var t16 = new Tile(ORANGE, CROSS);
+        var t17 = new Tile(ORANGE, DIAMOND);
+        grid.add(43, 42, DOWN, t16, t17);
+
+        assertThrows(QwirkleException.class, () -> {
+            grid.add(46, 43, LEFT, t16, t17);
+
+        });
+        assertNull(grid.get(0, 3));
+        assertNull(grid.get(0, 3));
+    }
+    @Test
+    void rules_vincent_h_adapted_to_fail_3() {
+        var t1 = new Tile(RED, ROUND);
+        var t2 = new Tile(RED, DIAMOND);
+        var t3 = new Tile(RED, PLUS);
+        grid.firstAdd(UP, t1, t2, t3);
+
+        var t4 = new Tile(RED, SQUARE);
+        var t5 = new Tile(BLUE, SQUARE);
+        var t6 = new Tile(PURPLE, SQUARE);
+        grid.add(46, 45, RIGHT, t4, t5, t6);
+
+        var t7 = new Tile(BLUE, ROUND);
+        grid.add(45, 46, t7);
+
+        var t8 = new Tile(GREEN, DIAMOND);
+        var t9 = new Tile(GREEN, PLUS);
+        grid.add(44, 44, UP, t8, t9);
+
+        var t10 = new Tile(GREEN, ROUND);
+        var t11 = new Tile(GREEN, STAR);
+        grid.add(new TileAtPosition(45, 44, t10), new TileAtPosition(42, 44, t11));
+        var t12 = new Tile(RED, SQUARE);
+        var t13 = new Tile(ORANGE, SQUARE);
+        grid.add(new TileAtPosition(46, 48, t13), new TileAtPosition(47, 48, t12));
+        var t14 = new Tile(YELLOW, STAR);
+        var t15 = new Tile(ORANGE, STAR);
+        grid.add(42, 43, LEFT, t14, t15);
+
+        var t16 = new Tile(ORANGE, CROSS);
+        var t17 = new Tile(ORANGE, DIAMOND);
+        grid.add(43, 42, DOWN, t16, t17);
+
+        assertThrows(QwirkleException.class, () -> {
+            grid.add(46, 43, LEFT, t16, t17);
+
+        });
+        assertNull(grid.get(5, 8));
+        assertNull(grid.get(1, 3));
+    }
+
+
+    @Test
+    void rules_sonia_i_adapted() {
+        var t1 = new Tile(RED, ROUND);
+        var t2 = new Tile(RED, DIAMOND);
+        var t3 = new Tile(RED, PLUS);
+        grid.firstAdd(UP, t1, t2, t3);
+
+        var t4 = new Tile(RED, SQUARE);
+        var t5 = new Tile(BLUE, SQUARE);
+        var t6 = new Tile(PURPLE, SQUARE);
+        grid.add(46, 45, RIGHT, t4, t5, t6);
+
+        var t7 = new Tile(BLUE, ROUND);
+        grid.add(45, 46, t7);
+
+        var t8 = new Tile(GREEN, DIAMOND);
+        var t9 = new Tile(GREEN, PLUS);
+        grid.add(44, 44, UP, t8, t9);
+
+        var t10 = new Tile(GREEN, ROUND);
+        var t11 = new Tile(GREEN, STAR);
+        grid.add(new TileAtPosition(45, 44, t10), new TileAtPosition(42, 44, t11));
+        var t12 = new Tile(RED, SQUARE);
+        var t13 = new Tile(ORANGE, SQUARE);
+        grid.add(new TileAtPosition(46, 48, t13), new TileAtPosition(47, 48, t12));
+        var t14 = new Tile(YELLOW, STAR);
+        var t15 = new Tile(ORANGE, STAR);
+        grid.add(42, 43, LEFT, t14, t15);
+
+        var t16 = new Tile(ORANGE, CROSS);
+        var t17 = new Tile(ORANGE, DIAMOND);
+        grid.add(43, 42, DOWN, t16, t17);
+
+        var t18 = new Tile(YELLOW, DIAMOND);
+        var t19 = new Tile(YELLOW, ROUND);
+        grid.add(44, 43, DOWN, t18, t19);
+
+        assertEquals(t18, get(grid, -1, -2));
+        assertEquals(t19, get(grid, 0, -2));
+    }
+    @Test
+    void rules_sonia_i_adapted_to_fail() {
+        var t1 = new Tile(RED, ROUND);
+        var t2 = new Tile(RED, DIAMOND);
+        var t3 = new Tile(RED, PLUS);
+        grid.firstAdd(UP, t1, t2, t3);
+
+        var t4 = new Tile(RED, SQUARE);
+        var t5 = new Tile(BLUE, SQUARE);
+        var t6 = new Tile(PURPLE, SQUARE);
+        grid.add(46, 45, RIGHT, t4, t5, t6);
+
+        var t7 = new Tile(BLUE, ROUND);
+        grid.add(45, 46, t7);
+        ;
+        var t8 = new Tile(GREEN, DIAMOND);
+        var t9 = new Tile(GREEN, PLUS);
+        grid.add(44, 44, UP, t8, t9);
+
+        var t10 = new Tile(GREEN, ROUND);
+        var t11 = new Tile(GREEN, STAR);
+        grid.add(new TileAtPosition(45, 44, t10), new TileAtPosition(42, 44, t11));
+        var t12 = new Tile(RED, SQUARE);
+        var t13 = new Tile(ORANGE, SQUARE);
+        grid.add(new TileAtPosition(46, 48, t13), new TileAtPosition(47, 48, t12));
+        var t14 = new Tile(YELLOW, STAR);
+        var t15 = new Tile(ORANGE, STAR);
+        grid.add(42, 43, LEFT, t14, t15);
+
+        var t16 = new Tile(ORANGE, CROSS);
+        var t17 = new Tile(ORANGE, DIAMOND);
+        grid.add(43, 42, DOWN, t16, t17);
+
+        var t18 = new Tile(YELLOW, DIAMOND);
+        var t19 = new Tile(YELLOW, ROUND);
+        assertThrows(QwirkleException.class, () -> {
+            grid.add(46, 43, DOWN, t18, t19);
+
+        });
+        assertNull(grid.get(-1, -2));
+        assertNull(grid.get(1, 3));
+    }
+    @Test
+    void rules_sonia_i_adapted_to_fail_2() {
+        var t1 = new Tile(RED, ROUND);
+        var t2 = new Tile(RED, DIAMOND);
+        var t3 = new Tile(RED, PLUS);
+        grid.firstAdd(UP, t1, t2, t3);
+
+        var t4 = new Tile(RED, SQUARE);
+        var t5 = new Tile(BLUE, SQUARE);
+        var t6 = new Tile(PURPLE, SQUARE);
+        grid.add(46, 45, RIGHT, t4, t5, t6);
+
+        var t7 = new Tile(BLUE, ROUND);
+        grid.add(45, 46, t7);
+
+        var t8 = new Tile(GREEN, DIAMOND);
+        var t9 = new Tile(GREEN, PLUS);
+        grid.add(44, 44, UP, t8, t9);
+
+        var t10 = new Tile(GREEN, ROUND);
+        var t11 = new Tile(GREEN, STAR);
+        grid.add(new TileAtPosition(45, 44, t10), new TileAtPosition(42, 44, t11));
+
+        var t12 = new Tile(RED, SQUARE);
+        var t13 = new Tile(ORANGE, SQUARE);
+        grid.add(new TileAtPosition(46, 48, t13), new TileAtPosition(47, 48, t12));
+
+        var t14 = new Tile(YELLOW, STAR);
+        var t15 = new Tile(ORANGE, STAR);
+        grid.add(42, 43, LEFT, t14, t15);
+
+        var t16 = new Tile(ORANGE, CROSS);
+        var t17 = new Tile(ORANGE, DIAMOND);
+        grid.add(43, 42, DOWN, t16, t17);
+
+        var t18 = new Tile(YELLOW, DIAMOND);
+        var t19 = new Tile(PURPLE, ROUND);
+        assertThrows(QwirkleException.class, () -> {
+            grid.add(46, 43, DOWN, t18, t19);
+
+        });
+        assertNull(grid.get(-1, -2));
+        assertNull(grid.get(1, 3));
+    }
+
+
+    @Test
+    void rules_cedric_j_adapted() {
+        var t1 = new Tile(RED, ROUND);
+        var t2 = new Tile(RED, DIAMOND);
+        var t3 = new Tile(RED, PLUS);
+        grid.firstAdd(UP, t1, t2, t3);
+
+        var t4 = new Tile(RED, SQUARE);
+        var t5 = new Tile(BLUE, SQUARE);
+        var t6 = new Tile(PURPLE, SQUARE);
+        grid.add(46, 45, RIGHT, t4, t5, t6);
+
+        var t7 = new Tile(BLUE, ROUND);
+        grid.add(45, 46, t7);
+
+        var t8 = new Tile(GREEN, DIAMOND);
+        var t9 = new Tile(GREEN, PLUS);
+        grid.add(44, 44, UP, t8, t9);
+
+        var t10 = new Tile(GREEN, ROUND);
+        var t11 = new Tile(GREEN, STAR);
+        grid.add(new TileAtPosition(45, 44, t10), new TileAtPosition(42, 44, t11));
+
+        var t12 = new Tile(RED, SQUARE);
+        var t13 = new Tile(ORANGE, SQUARE);
+        grid.add(new TileAtPosition(46, 48, t13), new TileAtPosition(47, 48, t12));
+
+        var t14 = new Tile(YELLOW, STAR);
+        var t15 = new Tile(ORANGE, STAR);
+        grid.add(42, 43, LEFT, t14, t15);
+
+        var t16 = new Tile(ORANGE, CROSS);
+        var t17 = new Tile(ORANGE, DIAMOND);
+        grid.add(43, 42, DOWN, t16, t17);
+
+        var t18 = new Tile(YELLOW, DIAMOND);
+        var t19 = new Tile(YELLOW, ROUND);
+        grid.add(44, 43, DOWN, t18, t19);
+        var t20 = new Tile(RED, STAR);
+        grid.add(42, 45, t20);
+        assertEquals(t20, get(grid, -3, 0));
+    }
+    @Test
+    void rules_cedric_j_adapted_to_fail() {
+        var t1 = new Tile(RED, ROUND);
+        var t2 = new Tile(RED, DIAMOND);
+        var t3 = new Tile(RED, PLUS);
+        grid.firstAdd(UP, t1, t2, t3);
+
+        var t4 = new Tile(RED, SQUARE);
+        var t5 = new Tile(BLUE, SQUARE);
+        var t6 = new Tile(PURPLE, SQUARE);
+        grid.add(46, 45, RIGHT, t4, t5, t6);
+
+        var t7 = new Tile(BLUE, ROUND);
+        grid.add(45, 46, t7);
+
+        var t8 = new Tile(GREEN, DIAMOND);
+        var t9 = new Tile(GREEN, PLUS);
+        grid.add(44, 44, UP, t8, t9);
+
+        var t10 = new Tile(GREEN, ROUND);
+        var t11 = new Tile(GREEN, STAR);
+        grid.add(new TileAtPosition(45, 44, t10), new TileAtPosition(42, 44, t11));
+
+        var t12 = new Tile(RED, SQUARE);
+        var t13 = new Tile(ORANGE, SQUARE);
+        grid.add(new TileAtPosition(46, 48, t13), new TileAtPosition(47, 48, t12));
+
+        var t14 = new Tile(YELLOW, STAR);
+        var t15 = new Tile(ORANGE, STAR);
+        grid.add(42, 43, LEFT, t14, t15);
+
+        var t16 = new Tile(ORANGE, CROSS);
+        var t17 = new Tile(ORANGE, DIAMOND);
+        grid.add(43, 42, DOWN, t16, t17);
+
+        var t18 = new Tile(YELLOW, DIAMOND);
+        var t19 = new Tile(YELLOW, ROUND);
+        grid.add(44, 43, DOWN, t18, t19);
+
+        var t20 = new Tile(RED, STAR);
+        assertThrows(QwirkleException.class, () -> {
+            grid.add(45, 43, DOWN, t20);
+
+        });
+        assertNull(grid.get(0,3));
+
+    }
+    @Test
+    void rules_cedric_j_adapted_to_fail_2() {
+        var t1 = new Tile(RED, ROUND);
+        var t2 = new Tile(RED, DIAMOND);
+        var t3 = new Tile(RED, PLUS);
+        grid.firstAdd(UP, t1, t2, t3);
+
+        var t4 = new Tile(RED, SQUARE);
+        var t5 = new Tile(BLUE, SQUARE);
+        var t6 = new Tile(PURPLE, SQUARE);
+        grid.add(46, 45, RIGHT, t4, t5, t6);
+
+        var t7 = new Tile(BLUE, ROUND);
+        grid.add(45, 46, t7);
+
+        var t8 = new Tile(GREEN, DIAMOND);
+        var t9 = new Tile(GREEN, PLUS);
+        grid.add(44, 44, UP, t8, t9);
+
+        var t10 = new Tile(GREEN, ROUND);
+        var t11 = new Tile(GREEN, STAR);
+        grid.add(new TileAtPosition(45, 44, t10), new TileAtPosition(42, 44, t11));
+        var t12 = new Tile(RED, SQUARE);
+        var t13 = new Tile(ORANGE, SQUARE);
+        grid.add(new TileAtPosition(46, 48, t13), new TileAtPosition(47, 48, t12));
+        var t14 = new Tile(YELLOW, STAR);
+        var t15 = new Tile(ORANGE, STAR);
+        grid.add(42, 43, LEFT, t14, t15);
+
+        var t16 = new Tile(ORANGE, CROSS);
+        var t17 = new Tile(ORANGE, DIAMOND);
+        grid.add(43, 42, DOWN, t16, t17);
+
+        var t18 = new Tile(YELLOW, DIAMOND);
+        var t19 = new Tile(YELLOW, ROUND);
+        grid.add(44, 43, DOWN, t18, t19);
+
+        var t20 = new Tile(RED, STAR);
+        assertThrows(QwirkleException.class, () -> {
+            grid.add(45, 44, DOWN, t20);
+
+        });
+        assertNull(grid.get(0,3));
+    }
+
+    @Test
+    void rules_elvire_k_adapted() {
+        var t1 = new Tile(RED, ROUND);
+        var t2 = new Tile(RED, DIAMOND);
+        var t3 = new Tile(RED, PLUS);
+        grid.firstAdd(UP, t1, t2, t3);
+
+        var t4 = new Tile(RED, SQUARE);
+        var t5 = new Tile(BLUE, SQUARE);
+        var t6 = new Tile(PURPLE, SQUARE);
+        grid.add(46, 45, RIGHT, t4, t5, t6);
+
+        var t7 = new Tile(BLUE, ROUND);
+        grid.add(45, 46, t7);
+
+        var t8 = new Tile(GREEN, DIAMOND);
+        var t9 = new Tile(GREEN, PLUS);
+        grid.add(44, 44, UP, t8, t9);
+
+        var t10 = new Tile(GREEN, ROUND);
+        var t11 = new Tile(GREEN, STAR);
+        grid.add(new TileAtPosition(45, 44, t10), new TileAtPosition(42, 44, t11));
+
+        var t12 = new Tile(RED, SQUARE);
+        var t13 = new Tile(ORANGE, SQUARE);
+        grid.add(new TileAtPosition(46, 48, t13), new TileAtPosition(47, 48, t12));
+
+        var t14 = new Tile(YELLOW, STAR);
+        var t15 = new Tile(ORANGE, STAR);
+        grid.add(42, 43, LEFT, t14, t15);
+
+        var t16 = new Tile(ORANGE, CROSS);
+        var t17 = new Tile(ORANGE, DIAMOND);
+        grid.add(43, 42, DOWN, t16, t17);
+
+        var t18 = new Tile(YELLOW, DIAMOND);
+        var t19 = new Tile(YELLOW, ROUND);
+        grid.add(44, 43, DOWN, t18, t19);
+        var t20 = new Tile(RED, STAR);
+        grid.add(42, 45, t20);
+        var t21 = new Tile(BLUE, CROSS);
+        var t22 = new Tile(RED, CROSS);
+        var t23 = new Tile(ORANGE, CROSS);
+        grid.add(47, 46, LEFT, t21, t22, t23);
+        assertEquals(t21, get(grid, 2, 1));
+        assertEquals(t22, get(grid, 2, 0));
+        assertEquals(t23, get(grid, 2, -1));
+    }
+    @Test
+    void rules_elvire_k_adapted_fail() {
+        var t1 = new Tile(RED, ROUND);
+        var t2 = new Tile(RED, DIAMOND);
+        var t3 = new Tile(RED, PLUS);
+        grid.firstAdd(UP, t1, t2, t3);
+
+        var t4 = new Tile(RED, SQUARE);
+        var t5 = new Tile(BLUE, SQUARE);
+        var t6 = new Tile(PURPLE, SQUARE);
+        grid.add(46, 45, RIGHT, t4, t5, t6);
+
+        var t7 = new Tile(BLUE, ROUND);
+        grid.add(45, 46, t7);
+
+        var t8 = new Tile(GREEN, DIAMOND);
+        var t9 = new Tile(GREEN, PLUS);
+        grid.add(44, 44, UP, t8, t9);
+
+        var t10 = new Tile(GREEN, ROUND);
+        var t11 = new Tile(GREEN, STAR);
+        grid.add(new TileAtPosition(45, 44, t10), new TileAtPosition(42, 44, t11));
+
+        var t12 = new Tile(RED, SQUARE);
+        var t13 = new Tile(ORANGE, SQUARE);
+        grid.add(new TileAtPosition(46, 48, t13), new TileAtPosition(47, 48, t12));
+
+        var t14 = new Tile(YELLOW, STAR);
+        var t15 = new Tile(ORANGE, STAR);
+        grid.add(42, 43, LEFT, t14, t15);
+
+        var t16 = new Tile(ORANGE, CROSS);
+        var t17 = new Tile(ORANGE, DIAMOND);
+        grid.add(43, 42, DOWN, t16, t17);
+
+        var t18 = new Tile(YELLOW, DIAMOND);
+        var t19 = new Tile(YELLOW, ROUND);
+        grid.add(44, 43, DOWN, t18, t19);
+        var t20 = new Tile(RED, STAR);
+        grid.add(42, 45, t20);
+        var t21 = new Tile(BLUE, CROSS);
+        var t22 = new Tile(RED, CROSS);
+        var t23 = new Tile(ORANGE, CROSS);
+        assertThrows(QwirkleException.class, ()->{
+            grid.add(52, 52, LEFT, t21, t22, t23);
+        });
+        assertNull(get(grid,7, 7));
+        assertNull(get(grid,7, 6));
+        assertNull(get(grid,7, 5));
+    }
+
+    @Test
+    void rules_vincent_l_adapted_fail() {
+        var t1 = new Tile(RED, ROUND);
+        var t2 = new Tile(RED, DIAMOND);
+        var t3 = new Tile(RED, PLUS);
+        grid.firstAdd(UP, t1, t2, t3);
+
+        var t4 = new Tile(RED, SQUARE);
+        var t5 = new Tile(BLUE, SQUARE);
+        var t6 = new Tile(PURPLE, SQUARE);
+        grid.add(46, 45, RIGHT, t4, t5, t6);
+
+        var t7 = new Tile(BLUE, ROUND);
+        grid.add(45, 46, t7);
+
+        var t8 = new Tile(GREEN, DIAMOND);
+        var t9 = new Tile(GREEN, PLUS);
+        grid.add(44, 44, UP, t8, t9);
+
+        var t10 = new Tile(GREEN, ROUND);
+        var t11 = new Tile(GREEN, STAR);
+        grid.add(new TileAtPosition(45, 44, t10), new TileAtPosition(42, 44, t11));
+
+        var t12 = new Tile(RED, SQUARE);
+        var t13 = new Tile(ORANGE, SQUARE);
+        grid.add(new TileAtPosition(46, 48, t13), new TileAtPosition(47, 48, t12));
+
+        var t14 = new Tile(YELLOW, STAR);
+        var t15 = new Tile(ORANGE, STAR);
+        grid.add(42, 43, LEFT, t14, t15);
+
+        var t16 = new Tile(ORANGE, CROSS);
+        var t17 = new Tile(ORANGE, DIAMOND);
+        grid.add(43, 42, DOWN, t16, t17);
+
+        var t18 = new Tile(YELLOW, DIAMOND);
+        var t19 = new Tile(YELLOW, ROUND);
+        grid.add(44, 43, DOWN, t18, t19);
+        var t20 = new Tile(RED, STAR);
+        grid.add(42, 45, t20);
+        var t21 = new Tile(BLUE, CROSS);
+        var t22 = new Tile(RED, CROSS);
+        var t23 = new Tile(ORANGE, CROSS);
+        grid.add(47, 46, LEFT, t21, t22, t23);
+        var t24 = new Tile(YELLOW, SQUARE);
+        var t25 = new Tile(BLUE, SQUARE);
+        grid.add(46, 49, DOWN, t24, t25);
+        assertEquals(t24, get(grid, 1, 4));
+        assertEquals(t25, get(grid, 2, 4));
+    }
+    @Test
+    void rules_vincent_l_adapted() {
+        var t1 = new Tile(RED, ROUND);
+        var t2 = new Tile(RED, DIAMOND);
+        var t3 = new Tile(RED, PLUS);
+        grid.firstAdd(UP, t1, t2, t3);
+
+        var t4 = new Tile(RED, SQUARE);
+        var t5 = new Tile(BLUE, SQUARE);
+        var t6 = new Tile(PURPLE, SQUARE);
+        grid.add(46, 45, RIGHT, t4, t5, t6);
+
+        var t7 = new Tile(BLUE, ROUND);
+        grid.add(45, 46, t7);
+
+        var t8 = new Tile(GREEN, DIAMOND);
+        var t9 = new Tile(GREEN, PLUS);
+        grid.add(44, 44, UP, t8, t9);
+
+        var t10 = new Tile(GREEN, ROUND);
+        var t11 = new Tile(GREEN, STAR);
+        grid.add(new TileAtPosition(45, 44, t10), new TileAtPosition(42, 44, t11));
+
+        var t12 = new Tile(RED, SQUARE);
+        var t13 = new Tile(ORANGE, SQUARE);
+        grid.add(new TileAtPosition(46, 48, t13), new TileAtPosition(47, 48, t12));
+
+        var t14 = new Tile(YELLOW, STAR);
+        var t15 = new Tile(ORANGE, STAR);
+        grid.add(42, 43, LEFT, t14, t15);
+
+        var t16 = new Tile(ORANGE, CROSS);
+        var t17 = new Tile(ORANGE, DIAMOND);
+        grid.add(43, 42, DOWN, t16, t17);
+
+        var t18 = new Tile(YELLOW, DIAMOND);
+        var t19 = new Tile(YELLOW, ROUND);
+        grid.add(44, 43, DOWN, t18, t19);
+        var t20 = new Tile(RED, STAR);
+        grid.add(42, 45, t20);
+        var t21 = new Tile(BLUE, CROSS);
+        var t22 = new Tile(RED, CROSS);
+        var t23 = new Tile(ORANGE, CROSS);
+        grid.add(47, 46, LEFT, t21, t22, t23);
+        var t24 = new Tile(YELLOW, SQUARE);
+        var t25 = new Tile(BLUE, SQUARE);
+        assertThrows(QwirkleException.class, () -> {
+            grid.add(-4, -4, DOWN, t24, t25);
+        });
+        assertNull(get(grid, 1, 4));
+        assertNull(get(grid, 2, 4));
+    }
+    @Test
+    void rules_vincent_l_adapted_to_fail() {
+        var t1 = new Tile(RED, ROUND);
+        var t2 = new Tile(RED, DIAMOND);
+        var t3 = new Tile(RED, PLUS);
+        grid.firstAdd(UP, t1, t2, t3);
+
+        var t4 = new Tile(RED, SQUARE);
+        var t5 = new Tile(BLUE, SQUARE);
+        var t6 = new Tile(PURPLE, SQUARE);
+        grid.add(46, 45, RIGHT, t4, t5, t6);
+
+        var t7 = new Tile(BLUE, ROUND);
+        grid.add(45, 46, t7);
+
+        var t8 = new Tile(GREEN, DIAMOND);
+        var t9 = new Tile(GREEN, PLUS);
+        grid.add(44, 44, UP, t8, t9);
+
+        var t10 = new Tile(GREEN, ROUND);
+        var t11 = new Tile(GREEN, STAR);
+        grid.add(new TileAtPosition(45, 44, t10), new TileAtPosition(42, 44, t11));
+
+        var t12 = new Tile(RED, SQUARE);
+        var t13 = new Tile(ORANGE, SQUARE);
+        grid.add(new TileAtPosition(46, 48, t13), new TileAtPosition(47, 48, t12));
+
+        var t14 = new Tile(YELLOW, STAR);
+        var t15 = new Tile(ORANGE, STAR);
+        grid.add(42, 43, LEFT, t14, t15);
+
+        var t16 = new Tile(ORANGE, CROSS);
+        var t17 = new Tile(ORANGE, DIAMOND);
+        grid.add(43, 42, DOWN, t16, t17);
+
+        var t18 = new Tile(YELLOW, DIAMOND);
+        var t19 = new Tile(YELLOW, ROUND);
+        grid.add(44, 43, DOWN, t18, t19);
+        var t20 = new Tile(RED, STAR);
+        grid.add(42, 45, t20);
+        var t21 = new Tile(BLUE, CROSS);
+        var t22 = new Tile(RED, CROSS);
+        var t23 = new Tile(ORANGE, CROSS);
+        grid.add(47, 46, LEFT, t21, t22, t23);
+        var t24 = new Tile(YELLOW, SQUARE);
+        var t25 = new Tile(BLUE, SQUARE);
+        assertThrows(QwirkleException.class, () -> {
+            grid.add(-3, -4, DOWN, t24, t25);
+        });
+        assertNull(get(grid, 1, 4));
+        assertNull(get(grid, 2, 4));
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*@Test
+void
+    public String displayGrid(Grid grid){
+        StringBuilder display= new StringBuilder();
+        for(int i=0;i<grid.getTiles().length;i++){
+            for(int j=0;j<grid.getTiles()[0].length;j++){
+                display.append("");
+                if(grid.get(i,j)==null){
+                    display.append("|*|");
+                }else {
+                    switch (grid.get(i, j).shape()) {
+                        case SQUARE -> display.append("|C|");
+                        case DIAMOND -> display.append("|D|");
+                        case ROUND -> display.append("|R|");
+                        case PLUS -> display.append("|P|");
+                        case STAR -> display.append("|S|");
+                        case CROSS -> display.append("|C|");
+                    }
+                }
+            }
+            display.append("\n");
+        }
+        return display.toString();
+    }*/
+
+
+
+
+
+    @Test
+    void firstAdd_cannot_be_called_twice () {
         Tile redcross = new Tile(RED, CROSS);
         Tile reddiamond = new Tile(RED, DIAMOND);
         grid.firstAdd(UP, redcross, reddiamond);
@@ -82,602 +1264,177 @@ class GridTest {
     }
 
     @Test
-    void firstAdd_must_be_called_first_simple() {
+    void test1 () {
+        var t1 = new Tile(RED, CROSS);
+        var t2 = new Tile(RED, CROSS);
+        assertThrows(QwirkleException.class, () -> grid.firstAdd(UP, t1, t2));
+    }
+    @Test
+    void test2 () {
+        var t1 = new Tile(BLUE, DIAMOND);
+        var t2 = new Tile(BLUE, CROSS);
+        grid.firstAdd(UP, t1, t2);
+        assertEquals(t1, grid.get(45, 45));
+        assertEquals(t2, grid.get(44, 45));
+    }
+    @Test
+    void test_adapted_to_fail_one () {
+        var t1 = new Tile(GREEN, SQUARE);
+        var t2 = new Tile(GREEN, SQUARE);
+        var t3 = new Tile(BLUE, STAR);
+        var t4 = new Tile(RED, DIAMOND);
+        assertThrows(QwirkleException.class, () -> grid.firstAdd(DOWN, t1, t2, t3, t4));
+    }
+    @Test
+    void test_adapted_to_fail_twoo () {
+        var t1 = new Tile(GREEN, SQUARE);
+        var t2 = new Tile(GREEN, SQUARE);
+        var t3 = new Tile(BLUE, STAR);
+        assertThrows(QwirkleException.class, () -> grid.firstAdd(RIGHT, t1, t2, t3));
+    }
+
+    @Test
+    void firstadd_test_not_fail() {
+        var t1 = new Tile(GREEN, SQUARE);
+        var t2 = new Tile(GREEN, ROUND);
+        var t3 = new Tile(GREEN, STAR);
+        var t4 = new Tile(GREEN, PLUS);
+        var t5 = new Tile(GREEN, CROSS);
+        var t6 = new Tile(GREEN, DIAMOND);
+        grid.firstAdd(UP, t1, t2, t3, t4, t5, t6);
+        assertEquals(t1, grid.get(45, 45));
+        assertEquals(t2, grid.get(44, 45));
+        assertEquals(t3, grid.get(43, 45));
+        assertEquals(t4, grid.get(42, 45));
+        assertEquals(t5, grid.get(41, 45));
+        assertEquals(t6, grid.get(40, 45));
+    }
+    @Test
+    void test_adapted_to_fail_Tree() {
+        var t1 = new Tile(GREEN, STAR);
+        var t2 = new Tile(GREEN, STAR);
+        var t3 = new Tile(BLUE, STAR);
+        var t4 = new Tile(RED, STAR);
+        var t5 = new Tile(PURPLE, STAR);
+        var t6 = new Tile(YELLOW, STAR);
+        assertThrows(QwirkleException.class, ()->grid.firstAdd(UP, t1, t2, t3, t4, t5, t6));
+    }
+
+
+    @Test
+    void firstAdd_must_be_called_first_simple () {
         Tile redcross = new Tile(RED, CROSS);
         assertThrows(QwirkleException.class, () -> add(grid, 0, 0, redcross));
+    }
+    @Test
+    void firstAdd_Same_Shape_2() {
+        Grid grid = new Grid();
+        Tile t1 = new Tile(RED, ROUND);
+        Tile t2 = new Tile(BLUE, ROUND);
+
+        grid.firstAdd(UP, t1, t2);
+        assertEquals(t1, grid.get(45, 45));
+        assertEquals(t2, grid.get(44, 45));
+    }
+
+    @Test
+    void add_TAP_Not_Linked_Short() {
+        Grid grid = new Grid();
+
+        //1
+        Tile t1 = new Tile(RED, ROUND);
+        Tile t2 = new Tile(RED, DIAMOND);
+        Tile t3 = new Tile(RED, PLUS);
+        grid.firstAdd(Direction.UP, t1, t2, t3);
+        assertEquals(t1, grid.get(45, 45));
+        assertEquals(t2, grid.get(44, 45));
+        assertEquals(t3, grid.get(43, 45));
+
+        //2
+        Tile t4 = new Tile(RED, SQUARE);
+        Tile t5 = new Tile(BLUE, SQUARE);
+        Tile t6 = new Tile(PURPLE, SQUARE);
+        grid.add(46, 45, RIGHT, t4, t5, t6);
+        assertEquals(t4, grid.get(46, 45));
+        assertEquals(t5, grid.get(46, 46));
+        assertEquals(t6, grid.get(46, 47));
+
+        //3
+        Tile t7 = new Tile(BLUE, ROUND);
+        grid.add(45, 46, t7);
+        assertEquals(t6, grid.get(46, 47));
+
+        //4
+        Tile t8 = new Tile(GREEN, PLUS);
+        Tile t9 = new Tile(GREEN, DIAMOND);
+
+        grid.add(43, 44, DOWN, t8, t9);
+        assertEquals(t8, grid.get(43, 44));
+        assertEquals(t9, grid.get(44, 44));
+
+        //5
+        TileAtPosition t10 = new TileAtPosition(42, 34, new Tile(GREEN, STAR));
+        TileAtPosition t11 = new TileAtPosition(42, 35, new Tile(GREEN, ROUND));
+        assertThrows(QwirkleException.class, () -> grid.add(t10, t11));
+        assertNull(grid.get(t10.row(), t10.col()));
+        assertNull(grid.get(t11.row(), t11.col()));
+    }
+    @Test
+    void firstAdd_Grid_Not_Empty() {
+        Grid grid = new Grid();
+        Tile t1 = new Tile(RED, ROUND);
+        Tile t2 = new Tile(RED, ROUND);
+
+        grid.firstAdd(UP, t1);
+
+        assertThrows(QwirkleException.class, () -> {
+            grid.firstAdd(UP, t2);
+        });
     }
 
     @Test
     @DisplayName("get outside the grid should return null, not throw")
-    void can_get_tile_outside_virtual_grid() {
+    void can_get_tile_outside_virtual_grid () {
         var g = new Grid();
         assertDoesNotThrow(() -> get(g, -250, 500));
         assertNull(get(g, -250, 500));
     }
-
     @Test
-    void rules_Cedric_B() {
-        var t1 = new Tile(RED, ROUND);
-        var t2 = new Tile(RED, DIAMOND);
-        var t3 = new Tile(RED, PLUS);
+    @DisplayName ("Complete a line leaving holes during internediary steps")
+    void canCompleteAline_Left_Middle_Right() {
+        var g = new Grid();
+        Tile TILE_RED_CROSS = new Tile(RED,CROSS);
+        Tile TILE_RED_PLUS = new Tile(RED,PLUS);
+        Tile TILE_RED_DIAMOND = new Tile(RED,DIAMOND);
+        g. firstAdd (RIGHT, TILE_RED_CROSS,TILE_RED_PLUS,TILE_RED_DIAMOND) ;
 
-        var t4 = new Tile(RED, SQUARE);
-        var t5 = new Tile(BLUE, SQUARE);
-        var t6 = new Tile(PURPLE, SQUARE);
+        Tile TILE_GREEN_CROSS = new Tile(GREEN,CROSS);
+        Tile TILE_YELLOW_CROSS = new Tile(YELLOW,CROSS);
+        Tile TILE_GREEN_DIAMOND = new Tile(GREEN,DIAMOND);
+        Tile TILE_YELLOM_DIAMOND = new Tile(YELLOW,DIAMOND);
 
-        grid.firstAdd(UP, t1, t2, t3);
-        grid.add(46, 45, RIGHT, t4, t5, t6);
-        assertEquals(t4, get(grid, 1, 0));
-        assertEquals(t5, get(grid, 1, 1));
-        assertEquals(t6, get(grid, 1, 2));
-    }
-
-    @Test
-    void rules_Elvire_C() {
-        var t1 = new Tile(RED, ROUND);
-        var t2 = new Tile(RED, DIAMOND);
-        var t3 = new Tile(RED, PLUS);
-
-        var t4 = new Tile(RED, SQUARE);
-        var t5 = new Tile(BLUE, SQUARE);
-        var t6 = new Tile(PURPLE, SQUARE);
-
-        var t7 = new Tile(BLUE, ROUND);
-
-        grid.firstAdd(UP, t1, t2, t3);
-        grid.add(46, 45, RIGHT, t4, t5, t6);
-        grid.add(45, 46, t7);
-        assertEquals(t7, get(grid, 0, 1));
+        add(g, 1, 0, TILE_GREEN_CROSS);
+        add(g, 2, 0, TILE_YELLOW_CROSS);
+        add(g, 1, 2, TILE_GREEN_DIAMOND);
+        add(g, 2, 2, TILE_YELLOM_DIAMOND);
+        Tile TILE_YELLOM_PLUS = new Tile(YELLOW,PLUS);
+        Tile TILE_YELLOM_ROUND = new Tile(YELLOW,ROUND);
+        Tile TILE_YELLOW_STAR = new Tile(YELLOW,STAR);
+        TileAtPosition plus_left = createTileAtpos (2, -1, TILE_YELLOM_PLUS);
+        TileAtPosition round_center = createTileAtpos (2, 1, TILE_YELLOM_ROUND);
+        TileAtPosition star_right = createTileAtpos(2, 3, TILE_YELLOW_STAR);
+        assertDoesNotThrow(() -> {
+            g.add(plus_left, star_right, round_center);// make sur having the center tile last does not throw.
+        });
+        GridView v = new GridView(g);
+        View.display(v);
+        assertEquals(plus_left.tile(), get(g,2,-1));
+        assertEquals(round_center.tile(), get(g,2,1));
+        assertEquals(star_right.tile(), get(g,2,3));
 
     }
-
-    @Test
-    void rules_Vincent_D() {
-        var t1 = new Tile(RED, ROUND);
-        var t2 = new Tile(RED, DIAMOND);
-        var t3 = new Tile(RED, PLUS);
-
-        var t4 = new Tile(RED, SQUARE);
-        var t5 = new Tile(BLUE, SQUARE);
-        var t6 = new Tile(PURPLE, SQUARE);
-
-        var t7 = new Tile(BLUE, ROUND);
-
-        var t8 = new Tile(GREEN, PLUS);
-        var t9 = new Tile(GREEN, DIAMOND);
-
-
-        grid.firstAdd(UP, t1, t2, t3);
-        grid.add(46, 45, RIGHT, t4, t5, t6);
-        grid.add(45, 46, t7);
-        grid.add(43, 44, DOWN, t8, t9);
-
-        assertEquals(t8, get(grid, -2, -1));
-        assertEquals(t9, get(grid, -1, -1));
-
-    }
-
-    @Test
-    void rules_Sonia_E() {
-        var t1 = new Tile(RED, ROUND);
-        var t2 = new Tile(RED, DIAMOND);
-        var t3 = new Tile(RED, PLUS);
-
-        var t4 = new Tile(RED, SQUARE);
-        var t5 = new Tile(BLUE, SQUARE);
-        var t6 = new Tile(PURPLE, SQUARE);
-
-        var t7 = new Tile(BLUE, ROUND);
-
-        var t8 = new Tile(GREEN, PLUS);
-        var t9 = new Tile(GREEN, DIAMOND);
-
-        //var t10 = new TileAtPosition(42,44,);
-        //var t11 = new TileAtPosition(45,44,new Tile(GREEN,ROUND));
-
-        var l = new Tile(GREEN, STAR);
-        var t10 = createTileAtpos(-3, -1, l);
-
-        var g = new Tile(GREEN, ROUND);
-        var t11 = createTileAtpos(0, -1, g);
-
-        grid.firstAdd(UP, t1, t2, t3);//a
-        grid.add(46, 45, RIGHT, t4, t5, t6);//b
-        grid.add(45, 46, t7);//c
-        grid.add(43, 44, DOWN, t8, t9);//d
-        grid.add(t10, t11);//e
-
-        assertEquals(l, get(grid, -3, -1));
-        assertEquals(g, get(grid, 0, -1));
-
-    }
-
-
-    @Test
-    void rules_Cedric_F_() {
-        var t1 = new Tile(RED, ROUND);
-        var t2 = new Tile(RED, DIAMOND);
-        var t3 = new Tile(RED, PLUS);
-
-        var t4 = new Tile(RED, SQUARE);
-        var t5 = new Tile(BLUE, SQUARE);
-        var t6 = new Tile(PURPLE, SQUARE);
-
-        var t7 = new Tile(BLUE, ROUND);
-
-        var t8 = new Tile(GREEN, PLUS);
-        var t9 = new Tile(GREEN, DIAMOND);
-
-
-        var l = new Tile(GREEN, STAR);
-        var t10 = createTileAtpos(-3, -1, l);//44,46
-
-        var g = new Tile(GREEN, ROUND);
-        var t11 = createTileAtpos(0, -1, g);
-
-        var t12 = new Tile(ORANGE, SQUARE);
-        var t13 = new Tile(RED, SQUARE);
-
-        grid.firstAdd(UP, t1, t2, t3);//a
-        grid.add(46, 45, RIGHT, t4, t5, t6);//b
-        grid.add(45, 46, t7);//c
-        grid.add(43, 44, DOWN, t8, t9);//d
-        grid.add(t10, t11);//e
-        grid.add(46, 48, DOWN, t12, t13);
-        ;
-
-
-        assertEquals(t12, get(grid, 1, 3));
-        assertEquals(t13, get(grid, 2, 3));
-
-
-    }
-    @Test
-    void rules_Cedric_SameRedPlusOverSameLine_() {
-        var t1 = new Tile(RED, ROUND);
-        var t2 = new Tile(RED, DIAMOND);
-        var t3 = new Tile(RED, PLUS);
-
-        var t4 = new Tile(RED, SQUARE);
-        var t5 = new Tile(BLUE, SQUARE);
-        var t6 = new Tile(PURPLE, SQUARE);
-
-        var t7 = new Tile(BLUE, ROUND);
-
-        var t8 = new Tile(GREEN, PLUS);
-        var t9 = new Tile(GREEN, DIAMOND);
-
-
-        var l = new Tile(GREEN, STAR);
-        var t10 = createTileAtpos(-3, -1, l);//44,46
-
-        var g = new Tile(GREEN, ROUND);
-        var t11 = createTileAtpos(0, -1, g);
-
-        //var t12 = new Tile(ORANGE, SQUARE);
-        //
-        var t13 = new Tile(RED, PLUS);
-
-        grid.firstAdd(UP, t1, t2, t3);//a
-        grid.add(46, 45, RIGHT, t4, t5, t6);//b
-        grid.add(45, 46, t7);//c
-        grid.add(43, 44, DOWN, t8, t9);//d
-        grid.add(t10, t11);//e
-        ;
-
-        assertThrows(QwirkleException.class, () ->  grid.add(47, 45,t13));
-        // assertEquals(t12, get(grid, 1, 3));
-        //assertEquals(t13, get(grid, 2, 3));
-
-
-    }
-
-    @Test
-    void rules_Elvire_G_() {
-        var t1 = new Tile(RED, ROUND);
-        var t2 = new Tile(RED, DIAMOND);
-        var t3 = new Tile(RED, PLUS);
-
-        var t4 = new Tile(RED, SQUARE);
-        var t5 = new Tile(BLUE, SQUARE);
-        var t6 = new Tile(PURPLE, SQUARE);
-
-        var t7 = new Tile(BLUE, ROUND);
-
-        var t8 = new Tile(GREEN, PLUS);
-        var t9 = new Tile(GREEN, DIAMOND);
-
-        var l = new Tile(GREEN, STAR);
-        var t10 = createTileAtpos(-3, -1, l);//44,46
-
-        var g = new Tile(GREEN, ROUND);
-        var t11 = createTileAtpos(0, -1, g);
-
-        var t12 = new Tile(ORANGE, SQUARE);
-        var t13 = new Tile(RED, SQUARE);
-
-        var t14 = new Tile(YELLOW, STAR);
-        var t15 = new Tile(ORANGE, STAR);
-
-        grid.firstAdd(UP, t1, t2, t3);//a
-        grid.add(46, 45, RIGHT, t4, t5, t6);//b
-        grid.add(45, 46, t7);//c
-        grid.add(43, 44, DOWN, t8, t9);//d
-        grid.add(t10, t11);//e
-        grid.add(46, 48, DOWN, t12, t13);
-        grid.add(42, 43, LEFT, t14, t15);
-
-        //assertThrows(QwirkleException.class, () -> grid.add(t10,t11));
-        assertEquals(t14, get(grid, -3, -2));
-        assertEquals(t15, get(grid, -3, -3));
-
-    }
-    @Test
-    void rules_Vincent_H_() {
-        var t1 = new Tile(RED, ROUND);
-        var t2 = new Tile(RED, DIAMOND);
-        var t3 = new Tile(RED, PLUS);
-
-        var t4 = new Tile(RED, SQUARE);
-        var t5 = new Tile(BLUE, SQUARE);
-        var t6 = new Tile(PURPLE, SQUARE);
-
-        var t7 = new Tile(BLUE, ROUND);
-
-        var t8 = new Tile(GREEN, PLUS);
-        var t9 = new Tile(GREEN, DIAMOND);
-
-        var l = new Tile(GREEN, STAR);
-        var t10 = createTileAtpos(-3, -1, l);//44,46
-
-        var g = new Tile(GREEN, ROUND);
-        var t11 = createTileAtpos(0, -1, g);
-
-        var t12 = new Tile(ORANGE, SQUARE);
-        var t13 = new Tile(RED, SQUARE);
-
-        var t14 = new Tile(YELLOW, STAR);
-        var t15 = new Tile(ORANGE, STAR);
-
-        var t16 = new Tile(ORANGE, CROSS);
-        var t17 = new Tile(ORANGE, DIAMOND);
-
-        grid.firstAdd(UP, t1, t2, t3);//a
-        grid.add(46, 45, RIGHT, t4, t5, t6);//b
-        grid.add(45, 46, t7);//c
-        grid.add(43, 44, DOWN, t8, t9);//d
-        grid.add(t10, t11);//e
-        grid.add(46, 48, DOWN, t12, t13);
-        grid.add(42, 43, LEFT, t14, t15);
-        grid.add(43, 42, DOWN, t16, t17);
-
-        //assertThrows(QwirkleException.class, () -> grid.add(t10,t11));
-        assertEquals(t16, get(grid, -2, -3));
-        assertEquals(t17, get(grid, -1, -3));
-
-    }
-    @Test
-    void rules_Sonia_I_() {
-        var t1 = new Tile(RED, ROUND);
-        var t2 = new Tile(RED, DIAMOND);
-        var t3 = new Tile(RED, PLUS);
-
-        var t4 = new Tile(RED, SQUARE);
-        var t5 = new Tile(BLUE, SQUARE);
-        var t6 = new Tile(PURPLE, SQUARE);
-
-        var t7 = new Tile(BLUE, ROUND);
-
-        var t8 = new Tile(GREEN, PLUS);
-        var t9 = new Tile(GREEN, DIAMOND);
-
-        var l = new Tile(GREEN, STAR);
-        var t10 = createTileAtpos(-3, -1, l);//44,46
-
-        var g = new Tile(GREEN, ROUND);
-        var t11 = createTileAtpos(0, -1, g);
-
-        var t12 = new Tile(ORANGE, SQUARE);
-        var t13 = new Tile(RED, SQUARE);
-
-        var t14 = new Tile(YELLOW, STAR);
-        var t15 = new Tile(ORANGE, STAR);
-
-        var t16 = new Tile(ORANGE, CROSS);
-        var t17 = new Tile(ORANGE, DIAMOND);
-
-        var t18 = new Tile(YELLOW, DIAMOND);
-        var t19 = new Tile(YELLOW, ROUND);
-
-        grid.firstAdd(UP, t1, t2, t3);//a
-        grid.add(46, 45, RIGHT, t4, t5, t6);//b
-        grid.add(45, 46, t7);//c
-        grid.add(43, 44, DOWN, t8, t9);//d
-        grid.add(t10, t11);//e
-        grid.add(46, 48, DOWN, t12, t13);
-        grid.add(42, 43, LEFT, t14, t15);
-        grid.add(43, 42, DOWN, t16, t17);
-        grid.add(44, 43, DOWN, t18, t19);
-
-        //assertThrows(QwirkleException.class, () -> grid.add(t10,t11));
-        assertEquals(t18, get(grid, -1, -2));
-        assertEquals(t19, get(grid, 0, -2));
-
-    }
-    @Test
-    void rules_Cedric_J_() {
-        var t1 = new Tile(RED, ROUND);
-        var t2 = new Tile(RED, DIAMOND);
-        var t3 = new Tile(RED, PLUS);
-
-        var t4 = new Tile(RED, SQUARE);
-        var t5 = new Tile(BLUE, SQUARE);
-        var t6 = new Tile(PURPLE, SQUARE);
-
-        var t7 = new Tile(BLUE, ROUND);
-
-        var t8 = new Tile(GREEN, PLUS);
-        var t9 = new Tile(GREEN, DIAMOND);
-
-        var l = new Tile(GREEN, STAR);
-        var t10 = createTileAtpos(-3, -1, l);//44,46
-
-        var g = new Tile(GREEN, ROUND);
-        var t11 = createTileAtpos(0, -1, g);
-
-        var t12 = new Tile(ORANGE, SQUARE);
-        var t13 = new Tile(RED, SQUARE);
-
-        var t14 = new Tile(YELLOW, STAR);
-        var t15 = new Tile(ORANGE, STAR);
-
-        var t16 = new Tile(ORANGE, CROSS);
-        var t17 = new Tile(ORANGE, DIAMOND);
-
-        var t18 = new Tile(YELLOW, DIAMOND);
-        var t19 = new Tile(YELLOW, ROUND);
-
-        var t20 = new Tile(RED, STAR);
-
-        grid.firstAdd(UP, t1, t2, t3);//a
-        grid.add(46, 45, RIGHT, t4, t5, t6);//b
-        grid.add(45, 46, t7);//c
-        grid.add(43, 44, DOWN, t8, t9);//d
-        grid.add(t10, t11);//e
-        grid.add(46, 48, DOWN, t12, t13);
-        grid.add(42, 43, LEFT, t14, t15);
-        grid.add(43, 42, DOWN, t16, t17);
-        grid.add(44, 43, DOWN, t18, t19);
-        grid.add(42, 45, t20);
-
-        //assertThrows(QwirkleException.class, () -> grid.add(t10,t11));
-        assertEquals(t20, get(grid, -3, 0));
-
-
-    }
-    @Test
-    void rules_Cedric_J_Fail_() {
-        var t1 = new Tile(RED, ROUND);
-        var t2 = new Tile(RED, DIAMOND);
-        var t3 = new Tile(RED, PLUS);
-
-        var t4 = new Tile(RED, SQUARE);
-        var t5 = new Tile(BLUE, SQUARE);
-        var t6 = new Tile(PURPLE, SQUARE);
-
-        var t7 = new Tile(BLUE, ROUND);
-
-        var t8 = new Tile(GREEN, PLUS);
-        var t9 = new Tile(GREEN, DIAMOND);
-
-        var l = new Tile(GREEN, STAR);
-        var t10 = createTileAtpos(-3, -1, l);//44,46
-
-        var g = new Tile(GREEN, ROUND);
-        var t11 = createTileAtpos(0, -1, g);
-
-        var t12 = new Tile(ORANGE, SQUARE);
-        var t13 = new Tile(RED, SQUARE);
-
-        var t14 = new Tile(YELLOW, STAR);
-        var t15 = new Tile(ORANGE, STAR);
-
-        var t16 = new Tile(ORANGE, CROSS);
-        var t17 = new Tile(ORANGE, DIAMOND);
-
-        var t18 = new Tile(YELLOW, DIAMOND);
-        var t19 = new Tile(YELLOW, ROUND);
-
-        var t20 = new Tile(YELLOW, SQUARE);
-
-        grid.firstAdd(UP, t1, t2, t3);//a
-        grid.add(46, 45, RIGHT, t4, t5, t6);//b
-        grid.add(45, 46, t7);//c
-        grid.add(43, 44, DOWN, t8, t9);//d
-        grid.add(t10, t11);//e
-        grid.add(46, 48, DOWN, t12, t13);
-        grid.add(42, 43, LEFT, t14, t15);
-        grid.add(43, 42, DOWN, t16, t17);
-        grid.add(44, 43, DOWN, t18, t19);
-
-
-        assertThrows(QwirkleException.class, () -> grid.add(43, 43, t20));
-
-
-
-    }
-    @Test
-    void rules_Elvire_K_() {
-        var t1 = new Tile(RED, ROUND);
-        var t2 = new Tile(RED, DIAMOND);
-        var t3 = new Tile(RED, PLUS);
-
-        var t4 = new Tile(RED, SQUARE);
-        var t5 = new Tile(BLUE, SQUARE);
-        var t6 = new Tile(PURPLE, SQUARE);
-
-        var t7 = new Tile(BLUE, ROUND);
-
-        var t8 = new Tile(GREEN, PLUS);
-        var t9 = new Tile(GREEN, DIAMOND);
-
-        var l = new Tile(GREEN, STAR);
-        var t10 = createTileAtpos(-3, -1, l);//44,46
-
-        var g = new Tile(GREEN, ROUND);
-        var t11 = createTileAtpos(0, -1, g);
-
-        var t12 = new Tile(ORANGE, SQUARE);
-        var t13 = new Tile(RED, SQUARE);
-
-        var t14 = new Tile(YELLOW, STAR);
-        var t15 = new Tile(ORANGE, STAR);
-
-        var t16 = new Tile(ORANGE, CROSS);
-        var t17 = new Tile(ORANGE, DIAMOND);
-
-        var t18 = new Tile(YELLOW, DIAMOND);
-        var t19 = new Tile(YELLOW, ROUND);
-
-        var t20 = new Tile(RED, STAR);
-
-        var t21 = new Tile(BLUE, CROSS);
-        var t22= new Tile(RED, CROSS);
-        var t23= new Tile(ORANGE, CROSS);
-
-        grid.firstAdd(UP, t1, t2, t3);//a
-        grid.add(46, 45, RIGHT, t4, t5, t6);//b
-        grid.add(45, 46, t7);//c
-        grid.add(43, 44, DOWN, t8, t9);//d
-        grid.add(t10, t11);//e
-        grid.add(46, 48, DOWN, t12, t13);
-        grid.add(42, 43, LEFT, t14, t15);
-        grid.add(43, 42, DOWN, t16, t17);
-        grid.add(44, 43, DOWN, t18, t19);
-        grid.add(47, 46, LEFT,t21,t22,t23);
-
-        //assertThrows(QwirkleException.class, () -> grid.add(t10,t11));
-        assertEquals(t21, get(grid, 2, 1));
-        assertEquals(t22, get(grid, 2, 0));
-        assertEquals(t23, get(grid, 2, -1));
-
-    }
-    @Test
-    void rules_Vincent_L_() {
-        var t1 = new Tile(RED, ROUND);
-        var t2 = new Tile(RED, DIAMOND);
-        var t3 = new Tile(RED, PLUS);
-
-        var t4 = new Tile(RED, SQUARE);
-        var t5 = new Tile(BLUE, SQUARE);
-        var t6 = new Tile(PURPLE, SQUARE);
-
-        var t7 = new Tile(BLUE, ROUND);
-
-        var t8 = new Tile(GREEN, PLUS);
-        var t9 = new Tile(GREEN, DIAMOND);
-
-        var l = new Tile(GREEN, STAR);
-        var t10 = createTileAtpos(-3, -1, l);//44,46
-
-        var g = new Tile(GREEN, ROUND);
-        var t11 = createTileAtpos(0, -1, g);
-
-        var t12 = new Tile(ORANGE, SQUARE);
-        var t13 = new Tile(RED, SQUARE);
-
-        var t14 = new Tile(YELLOW, STAR);
-        var t15 = new Tile(ORANGE, STAR);
-
-        var t16 = new Tile(ORANGE, CROSS);
-        var t17 = new Tile(ORANGE, DIAMOND);
-
-        var t18 = new Tile(YELLOW, DIAMOND);
-        var t19 = new Tile(YELLOW, ROUND);
-
-        var t20 = new Tile(RED, STAR);
-
-        var t21 = new Tile(BLUE, CROSS);
-        var t22= new Tile(RED, CROSS);
-        var t23= new Tile(ORANGE, CROSS);
-
-        var t24 = new Tile(YELLOW, SQUARE);
-        var t25 = new Tile(BLUE, SQUARE);
-
-        grid.firstAdd(UP, t1, t2, t3);//a
-        grid.add(46, 45, RIGHT, t4, t5, t6);//b
-        grid.add(45, 46, t7);//c
-        grid.add(43, 44, DOWN, t8, t9);//d
-        grid.add(t10, t11);//e
-        grid.add(46, 48, DOWN, t12, t13);
-        grid.add(42, 43, LEFT, t14, t15);
-        grid.add(43, 42, DOWN, t16, t17);
-        grid.add(44, 43, DOWN, t18, t19);
-        grid.add(47, 46, LEFT,t21,t22,t23);
-        grid.add(46, 49, DOWN,t24,t25);
-
-        //assertThrows(QwirkleException.class, () -> grid.add(t10,t11));
-        assertEquals(t24, get(grid, 1, 4));
-        assertEquals(t25, get(grid, 2, 4));
-
-    }
-    @Test
-    void rules_Vincent_L_Fail_Inverse_Square() {
-        var t1 = new Tile(RED, ROUND);
-        var t2 = new Tile(RED, DIAMOND);
-        var t3 = new Tile(RED, PLUS);
-
-        var t4 = new Tile(RED, SQUARE);
-        var t5 = new Tile(BLUE, SQUARE);
-        var t6 = new Tile(PURPLE, SQUARE);
-
-        var t7 = new Tile(BLUE, ROUND);
-
-        var t8 = new Tile(GREEN, PLUS);
-        var t9 = new Tile(GREEN, DIAMOND);
-
-        var l = new Tile(GREEN, STAR);
-        var t10 = createTileAtpos(-3, -1, l);//44,46
-
-        var g = new Tile(GREEN, ROUND);
-        var t11 = createTileAtpos(0, -1, g);
-
-        var t12 = new Tile(ORANGE, SQUARE);
-        var t13 = new Tile(RED, SQUARE);
-
-        var t14 = new Tile(YELLOW, STAR);
-        var t15 = new Tile(ORANGE, STAR);
-
-        var t16 = new Tile(ORANGE, CROSS);
-        var t17 = new Tile(ORANGE, DIAMOND);
-
-        var t18 = new Tile(YELLOW, DIAMOND);
-        var t19 = new Tile(YELLOW, ROUND);
-
-        var t20 = new Tile(RED, STAR);
-
-        var t21 = new Tile(BLUE, CROSS);
-        var t22= new Tile(RED, CROSS);
-        var t23= new Tile(ORANGE, CROSS);
-
-        var t25 = new Tile(YELLOW, SQUARE);
-        var t24 = new Tile(BLUE, SQUARE);
-
-        grid.firstAdd(UP, t1, t2, t3);//a
-        grid.add(46, 45, RIGHT, t4, t5, t6);//b
-        grid.add(45, 46, t7);//c
-        grid.add(43, 44, DOWN, t8, t9);//d
-        grid.add(t10, t11);//e
-        grid.add(46, 48, DOWN, t12, t13);
-        grid.add(42, 43, LEFT, t14, t15);
-        grid.add(43, 42, DOWN, t16, t17);
-        grid.add(44, 43, DOWN, t18, t19);
-        grid.add(47, 46, LEFT,t21,t22,t23);
-
-
-        assertThrows(QwirkleException.class, () -> grid.add(46, 49, DOWN,t24,t25));
-
-
+    private void assertAtCorrectPosition(Grid g, TileAtPosition tile) {
+        assertEquals(tile.tile(), get(grid, tile.row(), tile.col()));
     }
 
 }

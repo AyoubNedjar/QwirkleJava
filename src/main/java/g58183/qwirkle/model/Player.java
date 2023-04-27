@@ -1,5 +1,6 @@
 package g58183.qwirkle.model;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Collections;
@@ -10,9 +11,11 @@ public class Player {
 
     public Player(String nom) {
         this.nom = nom;
+        tiles = new ArrayList<>();
     }
 
     public String getNom() {
+
         return nom;
     }
     public List<Tile> getHand(){
