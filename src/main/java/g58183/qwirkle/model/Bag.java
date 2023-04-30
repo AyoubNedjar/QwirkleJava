@@ -32,18 +32,22 @@ public class Bag {
     }
 
     /**
-     * instantiation check of a single tile bag
-     * @return
+     * This method returns an instance of the Bag class which represents a single tile bag.
+     * If no instance has been created yet, a new one is created and returned. If an instance
+     * already exists, that instance is returned.
+     *
+     * @return an instance of the Bag class
      */
     public static Bag getInstance() {
         if (instance == null) {
-            instance =  new Bag();
+            instance = new Bag();
         }
         return instance;
     }
 
     /**
      * gives random tiles in the bag
+     *
      * @param n which represents the number of tiles to flip
      * @return the number of tiles
      */
@@ -55,7 +59,7 @@ public class Bag {
         }
 
         //si le nombre de tuiles restantes est inferieur à n
-        if (nbtuiles <=n) {
+        if (nbtuiles <= n) {
             return (Tile[]) tiles.toArray();// cela va convertir la liste en un tableau vu que les restantes on les prend quand meme
 //
         } else {
@@ -63,7 +67,7 @@ public class Bag {
             for (int i = 0; i < n; i++) {
                 int index = (int) (Math.random() * nbtuiles);
                 Tile t = tiles.get(index);
-                tab2[i] = new Tile(t.color(),t.shape());//cela creer une autre référence car on supprime l'objet juste après
+                tab2[i] = new Tile(t.color(), t.shape());//cela creer une autre référence car on supprime l'objet juste après
                 tiles.remove(index);
                 nbtuiles--;
             }
@@ -74,7 +78,10 @@ public class Bag {
 
     /**
      * give the size of the bag
+     *
      * @return the numbers of tiles in the bag
      */
-    public int size() {return tiles.size();}
+    public int size() {
+        return tiles.size();
+    }
 }

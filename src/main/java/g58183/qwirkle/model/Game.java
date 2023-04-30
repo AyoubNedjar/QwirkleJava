@@ -1,11 +1,10 @@
 package g58183.qwirkle.model;
 
-import java.util.Arrays;
 import java.util.List;
 
 public class Game {
-    private Grid grid;
-    private Player[] player;
+    private final Grid grid;
+    private final Player[] player;
     private int current;
 
     public Game(List<String> noms) {
@@ -40,8 +39,7 @@ public class Game {
             grid.firstAdd(d, tab);
             player[current].remove(tab);
             player[current].refill();
-            nextPlayer();
-            //grid.setEmpty(false);
+           pass();
         } catch (QwirkleException e) {
             System.out.println(e.getMessage());
         }
@@ -49,13 +47,6 @@ public class Game {
 
     }
 
-    /**
-     *
-     */
-    private void nextPlayer() {
-        current++;
-        current = current % player.length; //pour que si il depasse il revient au premier
-    }
 
     /**
      * Places a single tile on the grid at the specified row and column coordinates. The tile is removed from the
@@ -107,7 +98,6 @@ public class Game {
         } catch (QwirkleException e) {
             System.out.println(e.getMessage());
         }
-        ;
     }
 
     /**
@@ -183,7 +173,7 @@ public class Game {
      * This method advances the turn to the next player in the game.
      */
     public void pass() {
-        current++;
+        setCurrent(getCurrent()+1);
         current = current % player.length;
     }
 
@@ -192,7 +182,7 @@ public class Game {
      *
      * @return an array of all the players in the game.
      */
-    public Player[] getPlayer() {
+    public Player[] getPlayers() {
         return player;
     }
 

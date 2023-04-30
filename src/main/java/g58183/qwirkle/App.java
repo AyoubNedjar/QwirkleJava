@@ -12,28 +12,31 @@ public class App {
     private static View view;
 
     public static void main(String[] args) {
-      /*  int [] a = picpoc();
-        for (int ab:a) {
-            System.out.println(ab);
-        }*/
-        Scanner clavier = new Scanner(System.in);
         int nb = 0;
-        System.out.println("Bienvenue dans le jeu ");
+        View.displayTitle();
         System.out.println("Combien de joueurs vont jouer ? : ");
         nb = robuste(2, 4, "");
 
-        game = new Game(askName(nb));//demande de noms
-        game.setCurrent(getRandomPlayer(nb));//met current a un indice random;
-        View.display(game.getCurrentPlayer().getNom(), game.getCurrentPlayerHand());
-        System.out.println("c'est le tour de " + game.getCurrentPlayerName());
-        game.first(chooseDirection(), choosTiles());
-        View.display(game.getGrid());
+        try {
+            game = new Game(askName(nb));//demande de noms
+            game.setCurrent(getRandomPlayer(nb));//met current a un indice random;
+            View.display(game.getCurrentPlayer().getNom(), game.getCurrentPlayerHand());
+            System.out.println("C'est le tour de " + game.getCurrentPlayerName());
+            game.first(chooseDirection(), chooseTiles());
+            view.display(game.getGrid());
 
+        }catch(QwirkleException e){
+            System.out.println(View.ORANGE+e.getMessage()+View.RESET);
+            view.display(game.getGrid());
+        }
+
+        boolean replay = true;
         boolean isGameOver = false;
-        while(!isGameOver) {
+        while (replay) {
+            while (!isGameOver) {
 
                 boolean ok = true;
-                while (ok){
+                while (ok) {
                     try {
                         View.display(game.getCurrentPlayer().getNom(), game.getCurrentPlayerHand());//affiche la main du joueur courant
                         char choice = askMethod();//demande la methode choisie en vérifiant bien les commandes entrées.
@@ -42,203 +45,241 @@ public class App {
                         ok = false;
 
                     } catch (QwirkleException e) {
-                        view.displayError(e.getMessage());
-                        e.printStackTrace();
-
-                    }finally {
-                        view.displayError("Coup invalide rééssayer!");
+                        view.displayError(View.RED+e.getMessage()+View.RESET);
+                        view.displayError(View.RED+"Coup invalide rééssayer!"+View.RESET);
                         View.display(game.getGrid());
+                    } finally {
+
                     }
                 }
 
             }
-        System.out.println("Merci et au revoir");
+                isGameOver =  replayOrNot(isGameOver);
+                if(isGameOver){
+                    replay = false;
+                }
+
         }
-
-
-
-    private static char askMethod(){
-       char choice = robuste2();
-       return choice;
+        System.out.println(View.GREEN+"Merci et au revoir");
     }
 
 
-    private static boolean playChoice(char choice, boolean isGameOver ){
-        do {
-            switch (choice){
-                case 'o' -> {//joue une seule tuile
-                    View.display(game.getGrid());
-                    View.display(game.getCurrentPlayer().getNom(), game.getCurrentPlayerHand());
-                    System.out.println("Vous allez jouer une seule tuile.");
-                    int indexTile  = chooseOneTile();
-                    game.play(robuste(0, 90,"Choix de la ligne : "), robuste(0, 90, "Choix de la colonne : "),indexTile);
-                    return isGameOver;
-                }
-                case 'l' -> {//joue plusieurs tuiles a la suite des autres
-                    View.display(game.getGrid());
-                    View.display(game.getCurrentPlayer().getNom(), game.getCurrentPlayerHand());
-                    System.out.println("Vous allez jouer plusieurs tuiles qui vont se suivre.");
-                    int [] indexTiles  = choosTiles();
-                    Direction d = chooseDirection();
-                    game.play(robuste(0, 90,"Choix de la ligne : "), robuste(0, 90,"Choix de la colonne : "),d, indexTiles);
-                    return isGameOver;
-                }
-                case 'm' ->{//joue plusieurs ou une seule tuile dans des positions quelquonques
-                    View.display(game.getGrid());
-                    View.display(game.getCurrentPlayer().getNom(), game.getCurrentPlayerHand());
-                    game.play(picpoc());
-                    return isGameOver;
-                }
-                case 'f' ->{//joue plusieurs ou une seule tuile dans des positions quelquonques
-                    View.display(game.getCurrentPlayer().getNom(), game.getCurrentPlayerHand());
-                    game.first(chooseDirection(), choosTiles());
-                    return isGameOver;
-                }
-                case 'p' ->{//joue plusieurs ou une seule tuile dans des positions quelquonques
-                    System.out.println("La prochaine fois peut être hahah!!!");
-                    game.pass();
-                    return isGameOver;
-                }
-                case 'q' -> {
-                    isGameOver = true;
-                    return isGameOver;
-                }
-                case 'h' -> {
-                    View.display(game.getGrid());
-                }
-            }
-        }while (true);
-
+    private static char askMethod() {
+        return robusteChar();
     }
 
-    private static int robuste(int a, int b, String message){
-            boolean ok = true;
-            int nb = -1;
+
+    private static  boolean replayOrNot(boolean isGameOver){
+        String choice  ;
+        if(isGameOver)
             do {
-                try {
-                    if(!message.equals("")){
-                        System.out.print(message);
-                    }
+                System.out.println("Entrez 'y' pour recommencer, sinon 'n' pour quitter définitivement");
+                Scanner clavier = new Scanner(System.in);
+                choice = clavier.nextLine();
+                choice = choice.toLowerCase();
 
-                    Scanner clavier = new Scanner(System.in);
-                    nb = clavier.nextInt();
-                    if (nb < a || nb > b) {
-                        System.out.println("entrez un nombre entre "+a+" et "+b+" svp : ");
-                    } else {
-                        ok = false;
+                switch (choice.charAt(0)){
+                    case 'y' ->{
+                        return false;
                     }
-
-                } catch (InputMismatchException e) {
-                    System.out.println("veuillez entrez un numéro svp");
+                    case 'n' ->{
+                        return true;
+                    }
                 }
-            } while (ok);
-            return nb;
+
+            }while (true);
+        return false;
     }
-    private static char robuste2(){
-        String choice = "";
-
+    private static boolean playChoice(char choice, boolean isGameOver) {
         do {
-            //View.displayHelp();
-            System.out.print("Si vous avez besoin d'aide pour les commandes tapez 'h', sinon tapez le commande de votre choix  : ");
-            Scanner clavier = new Scanner(System.in);
-            choice = clavier.nextLine();
-            choice = choice.toLowerCase(Locale.ROOT);
-
-            if (game.getGrid().isEmpty()){
-                if (choice.charAt(0)=='f'){
-                    return 'f';
-                }else{
-                    throw new QwirkleException("Le plateau est vide , tapez 'f' pour commencer !");
+                switch (choice) {
+                    //joue plusieurs tuiles a la suite des autres
+                    //joue plusieurs ou une seule tuile dans des positions quelquonques
+                    case 'o', 'l', 'm', 'f' -> {
+                        executeChooice(choice);
+                        return isGameOver;
+                    }
+                    case 'p' -> {
+                        System.out.println(View.ORANGE+"Vous avez passé votre tour"+View.RESET);
+                        game.pass();
+                        return isGameOver;
+                    }
+                    case 'q' -> {
+                        isGameOver = true;
+                        return isGameOver;
+                    }
                 }
-            }
-            switch (choice.charAt(0)) {
-                case 'o' -> {
-                    return 'o';
-                }
-                case 'l' -> {
-                    return 'l';
-                }
-                case 'm' -> {
-                    return 'm';
-                }
-                case 'f' -> {
-                    System.out.println("Les premières tuiles ont déja été jouées");
-                    View.display(game.getGrid());
-                    View.display(game.getCurrentPlayerName(),game.getCurrentPlayerHand());
-                }
-                case 'p' -> {
-                    return 'p';
-                }
-                case 'q' -> {
-                    return 'q';
-                }
-                case 'h' -> {
-                    View.displayHelp();
-                }
-                default -> {
-                    System.out.println("Entrez une commande valide svp :");
-                    View.display(game.getGrid());
-                }
-
-            }
 
         } while (true);
 
     }
 
-    private static int[] picpoc(){
-        int []tab = new int[robuste(1,6,"Combien de tuiles voulez-vous jouez ? : ")*3];
+    private static void executeChooice(char choice){
+        View.display(game.getGrid());
+        View.display(game.getCurrentPlayer().getNom(), game.getCurrentPlayerHand());
+
+        switch (choice) {
+            case 'o' -> {//joue une seule tuile
+                System.out.println(View.GREEN+"Vous allez jouer une seule tuile."+View.RESET);
+                int indexTile = chooseOneTile();
+                game.play(robuste(0, 90, "Choix de la ligne : "), robuste(0, 90, "Choix de la colonne : "), indexTile);
+            }
+            case 'l' -> {//joue plusieurs tuiles a la suite des autres
+                System.out.println(View.GREEN+"Vous allez jouer plusieurs tuiles qui vont se suivre."+View.RESET);
+                int[] indexTiles = chooseTiles();
+                Direction d = chooseDirection();
+                game.play(robuste(0, 90, "Choix de la ligne : "), robuste(0, 90, "Choix de la colonne : "), d, indexTiles);
+            }
+            case 'm' -> {//joue plusieurs ou une seule tuile dans des positions quelquonques
+                System.out.println(View.GREEN+"Vous allez jouer plusieurs ou une seule tuile dans des positions quelquonques"+View.RESET);
+                game.play(picpoc());
+            }
+            case 'f' -> {//joue le premier coup
+                game.first(chooseDirection(), chooseTiles());
+            }
+        }
+    }
+
+    private static int robuste(int a, int b, String message) {
+        boolean ok = true;
+        int number = -1;
+        Scanner clavier = new Scanner(System.in);;
+        do {
+            try {
+                if (!message.equals("")) {
+                    System.out.print(message);
+                }
+
+                 clavier = new Scanner(System.in);
+                number = clavier.nextInt();
+                String n = String.valueOf(number);
+                if (number < a || number > b) {
+                    System.out.println(View.ORANGE+"entrez un nombre entre " + a + " et " + b + " svp : "+View.RESET);
+                } else {
+                    checkName(n);
+                    ok = false;
+                }
+
+            } catch (InputMismatchException e) {
+                System.out.println(View.ORANGE+"veuillez entrez un numéro svp"+View.RESET);
+            }catch (QwirkleException e){
+                System.out.println(View.ORANGE+"Vous avez rentré un espace , réésayez ! "+View.RESET);
+
+            }
+        } while (ok);
+        return number;
+    }
+
+    private static char robusteChar() {
+        String choice ;
+
+        do {
+            System.out.print("Si vous avez besoin d'aide pour les commandes tapez 'h'," +
+            " sinon tapez le commande de votre choix  : ");
+            try {
+                Scanner clavier = new Scanner(System.in);
+                choice = clavier.nextLine();
+                choice = choice.toLowerCase(Locale.ROOT);
+
+                if (game.getGrid().isEmpty()) {
+                    if (choice.charAt(0) == 'f') {
+                        return 'f';
+                    } else {
+                        throw new QwirkleException(View.ORANGE+"Le plateau est vide , tapez "+View.YELLOW_BOLD+"'f'"+View.RESET+ "pour commencer !"+View.RESET);
+                    }
+                }
+                switch (choice.charAt(0)) {
+                    case 'o' -> {
+                        return 'o';
+                    }
+                    case 'l' -> {
+                        return 'l';
+                    }
+                    case 'm' -> {
+                        return 'm';
+                    }
+                    case 'f' -> {
+                        System.out.println(View.ORANGE+"Les premières tuiles ont déja été jouées"+View.RESET);
+                        View.display(game.getGrid());
+                        View.display(game.getCurrentPlayerName(), game.getCurrentPlayerHand());
+                    }
+                    case 'p' -> {
+                        return 'p';
+                    }
+                    case 'q' -> {
+                        return 'q';
+                    }
+                    case 'h' -> {
+                        View.displayHelp();
+                    }
+                    default -> {
+                        System.out.println("Entrez une commande valide svp : ");
+                        View.display(game.getGrid());
+                    }
+                }
+            }catch (StringIndexOutOfBoundsException e){
+                System.out.println(View.ORANGE+"Vous avez rentré un espace , réésayez ! "+View.RESET);
+            }
+
+
+        } while (true);
+    }
+
+    private static int[] picpoc() {
+        int[] tab = new int[robuste(1, 6, "Combien de tuiles voulez-vous jouez ? : ") * 3];
         int i = 0;
-        int row =0;
-        int col = 0;
-        int iTile = 0;
+        int row ;
+        int col;
+        int indextile;
         int cpt = 1;
         do {
 
-                iTile = robuste(1,6,"Entrez la numéro de la tuile numéro "+cpt+" dont vous voulez jouez : ")-1;
-                row = robuste(0,90,"Entrez la ligne de la tuile numéro"+cpt+" : ");
-                col = robuste(0,90,"Entrez la colonne de la tuile numéro"+cpt+" : ");
-                tab[i] = row;
-                tab[i+1]= col;
-                tab[i+2] = iTile;
-                cpt++;
-                i = i+3;
-        }while (i< tab.length);
+            indextile = robuste(1, 6, "Entrez la numéro de la tuile numéro " + cpt + " dont vous voulez jouez : ") - 1;
+            row = robuste(0, 90, "Entrez la ligne de la tuile numéro" + cpt + " : ");
+            col = robuste(0, 90, "Entrez la colonne de la tuile numéro" + cpt + " : ");
+            tab[i] = row;
+            tab[i + 1] = col;
+            tab[i + 2] = indextile;
+            cpt++;
+            i = i + 3;
+        } while (i < tab.length);
 
         return tab;
     }
-    private  static  int chooseOneTile(){
-       return robuste(1, 6, "Entrez la numéro de la tuile dont vous voulez jouez")-1;//pour accéder aux indices
+
+    private static int chooseOneTile() {
+        return robuste(1, 6, "Entrez la numéro de la tuile dont vous voulez jouez : ") - 1;//pour accéder aux indices
 
     }
-    private static int[] choosTiles() {
-        System.out.println("Choisissez vos tuiles : ");
-        int nb;
+
+    private static int[] chooseTiles() {
+        System.out.println(View.GREEN+"Choisissez vos tuiles : "+View.RESET);
+        int number;
         boolean ok = true;
         List<Integer> maliste = new ArrayList<>();
         int i = 0;
         do {
             try {
-                System.out.println("choix de tuile numéro " + (i + 1));
+                System.out.print("Choix de tuile numéro " + (i + 1)+": ");
                 Scanner clavier = new Scanner(System.in);
-                nb = clavier.nextInt();
-                if (nb > 6 || nb < 1) {
-                    System.out.println("entrez un nombre entre 1 et 6 svp");
+                number = clavier.nextInt();
+                if (number > 6 || number < 1) {
+                    System.out.println(View.ORANGE+"Entrez un nombre entre 1 et 6 svp :"+View.RESET);
                 } else {
-                    if (maliste.contains(nb-1)) {
-                        System.out.println("cette tuile est déja choisi , essayer une autre");
+                    if (maliste.contains(number - 1)) {
+                        System.out.println(View.ORANGE+"Cette tuile est déja choisi , essayez une autre"+View.RESET);
                     } else {
-                        maliste.add(nb-1);//pour accéder aux indices de la main
+                        maliste.add(number - 1);//pour accéder aux indices de la main
                         i++;
-                        String a = "";
-                        do{
-                            System.out.println("Voulez vous entrez une nouvelle piece ? tapez '+' , sinon tapez N");
+                        String a ;
+                        do {
+                            System.out.print("Voulez vous entrez une nouvelle piece ? tapez '+' , sinon tapez N : ");
                             clavier = new Scanner(System.in);
                             a = clavier.nextLine();
 
-                        }while (!a.contains("N") && !a.contains("+"));
+                        } while (!a.contains("N") && !a.contains("+") && !a.contains(" "));
 
-                        if(a.contains("N")){
+                        if (a.contains("N")) {
                             ok = false;
                         }
 
@@ -247,25 +288,28 @@ public class App {
                 }
 
             } catch (InputMismatchException e) {
-                System.out.println("veuillez entrez un numéro svp");
+                System.out.println(View.ORANGE+"Veuillez entrez un numéro svp."+View.RESET);
+            }catch (StringIndexOutOfBoundsException e){
+                System.out.println(View.ORANGE+"Vous avez rentré un espace , réésayez ! "+View.RESET);
             }
         } while (ok && i < 6);
 
-        return  maliste.stream().mapToInt(x->x.intValue()).toArray();
-        //
+        return maliste.stream().mapToInt(Integer::intValue).toArray();// qui retourne une liste de int(entier simplement)
+        // et pas de Integer(classe objet)
+
     }
 
     private static Direction chooseDirection() {
-        System.out.println("Choisissez la Direction à prendre : ");
-        String d = "";
-        boolean ok = true;
-        int i = 0;
-        do {
-                System.out.println("Tapez r pour Droite, d pour Bas, u pour Haut, l pour gauche");
-                Scanner clavier = new Scanner(System.in);
-                d = clavier.nextLine();
-                d = d.toLowerCase(Locale.ROOT);
+        System.out.println(View.GREEN+"Choisissez la Direction à prendre : "+View.RESET);
+        String d ;
 
+        do {
+            System.out.println("Tapez "+View.YELLOW_BOLD+"'r'"+View.RESET+" pour Droite, "+View.YELLOW_BOLD+"'d'"+View.RESET+ " pour Bas, "+View.YELLOW_BOLD+"'u'"+View.RESET+ " pour Haut, "+View.YELLOW_BOLD+"'l'"+View.RESET+ " pour gauche");
+            Scanner clavier = new Scanner(System.in);
+            d = clavier.nextLine();
+            d = d.toLowerCase(Locale.ROOT);
+
+            try{
                 switch (d.charAt(0)) {
                     case 'r' -> {
                         return Direction.RIGHT;
@@ -279,31 +323,49 @@ public class App {
                     case 'd' -> {
                         return Direction.DOWN;
                     }
-                    default -> System.out.println("Entrez une direction valide svp :");
+                    default -> System.out.println("Entrez une direction valide svp, entrez 'h' pour de l'aide :");
                 }
-            }while (true) ;
-
-        }
-
-
-        private static int getRandomPlayer ( int nb){
-            int i = (int) (Math.random() * (nb - 1));
-            return i;
-        }
-
-        private static List<String> askName ( int nb){
-
-            List<String> names = new ArrayList<>();
-            Scanner clavier = new Scanner(System.in);
-            System.out.println("Saisies des noms");
-
-            for (int i = 0; i < nb; i++) {
-                System.out.println("entrez le nom du joueur numéro " + (i + 1));
-                String noms = clavier.nextLine();
-                names.add(noms);
+            }catch (StringIndexOutOfBoundsException e){
+                System.out.println(View.ORANGE+"Entrez une direction valide svp : "+View.RESET);
             }
-            // names.stream().forEach(System.out::println);
 
-            return names;
+        } while (true);
+
+    }
+
+
+    private static int getRandomPlayer(int nb) {
+        return (int) (Math.random() * (nb - 1));
+    }
+
+    private static List<String> askName(int nb) {
+        List<String> names = new ArrayList<>();
+        int i = 0;
+        String name;
+        System.out.println(View.GREEN+"Saisies des noms"+View.RESET);
+
+        while(i<nb){
+               try {
+                   Scanner clavier = new Scanner(System.in);
+                   System.out.print("Entrez le nom du joueur numéro " + (i + 1)+": ");
+                   name = clavier.nextLine();
+                   checkName(name);
+                   names.add(name);
+                   i++;
+               }catch (QwirkleException e){
+                   System.out.println(e.getMessage());
+               }catch (StringIndexOutOfBoundsException e){
+                   System.out.println(View.ORANGE+"Entrez une direction valide svp : "+View.RESET);
+               }
+        }
+        return names;
+    }
+
+    private static void checkName(String name){
+        if(name == null || name.trim().isEmpty()){
+            throw new QwirkleException(View.ORANGE+"Vous avez entrez un espace , veuillez entrer un nom valide svp : "+View.RESET);
         }
     }
+
+
+}

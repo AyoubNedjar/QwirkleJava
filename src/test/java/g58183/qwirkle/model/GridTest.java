@@ -37,7 +37,7 @@ class GridTest {
         grid.firstAdd(UP, tile2);
         Tile tile3 = new Tile(RED, CROSS);
 
-        View.display(gridView);
+
         assertThrows(QwirkleException.class, () -> add(grid, 0, 1, tile3));
 
     }
@@ -173,6 +173,7 @@ class GridTest {
             grid.add(45, 47, t7);
 
         });
+
     }
 
     @Test
@@ -307,7 +308,7 @@ class GridTest {
         var t11 = new Tile(GREEN, DIAMOND);
 
 
-        View.display(gridView);
+
         assertThrows(QwirkleException.class, () -> {
             grid.add(new TileAtPosition(45, 44, t10),new TileAtPosition(42,44,t11));
 
@@ -363,7 +364,7 @@ class GridTest {
         var t11 = new Tile(GREEN, STAR);
         grid.add(new TileAtPosition(45, 44, t10), new TileAtPosition(42, 44, t11));
 
-        View.display(gridView);
+
         assertThrows(QwirkleException.class, () -> {
             grid.add(new TileAtPosition(46, 48, t10), new TileAtPosition(47, 48, t11));
         });
@@ -1212,49 +1213,6 @@ class GridTest {
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*@Test
-void
-    public String displayGrid(Grid grid){
-        StringBuilder display= new StringBuilder();
-        for(int i=0;i<grid.getTiles().length;i++){
-            for(int j=0;j<grid.getTiles()[0].length;j++){
-                display.append("");
-                if(grid.get(i,j)==null){
-                    display.append("|*|");
-                }else {
-                    switch (grid.get(i, j).shape()) {
-                        case SQUARE -> display.append("|C|");
-                        case DIAMOND -> display.append("|D|");
-                        case ROUND -> display.append("|R|");
-                        case PLUS -> display.append("|P|");
-                        case STAR -> display.append("|S|");
-                        case CROSS -> display.append("|C|");
-                    }
-                }
-            }
-            display.append("\n");
-        }
-        return display.toString();
-    }*/
-
-
-
-
-
     @Test
     void firstAdd_cannot_be_called_twice () {
         Tile redcross = new Tile(RED, CROSS);
@@ -1339,9 +1297,7 @@ void
 
     @Test
     void add_TAP_Not_Linked_Short() {
-        Grid grid = new Grid();
-
-        //1
+        Grid g = new Grid();
         Tile t1 = new Tile(RED, ROUND);
         Tile t2 = new Tile(RED, DIAMOND);
         Tile t3 = new Tile(RED, PLUS);
@@ -1375,7 +1331,9 @@ void
         //5
         TileAtPosition t10 = new TileAtPosition(42, 34, new Tile(GREEN, STAR));
         TileAtPosition t11 = new TileAtPosition(42, 35, new Tile(GREEN, ROUND));
+
         assertThrows(QwirkleException.class, () -> grid.add(t10, t11));
+
         assertNull(grid.get(t10.row(), t10.col()));
         assertNull(grid.get(t11.row(), t11.col()));
     }
@@ -1426,15 +1384,15 @@ void
         assertDoesNotThrow(() -> {
             g.add(plus_left, star_right, round_center);// make sur having the center tile last does not throw.
         });
-        GridView v = new GridView(g);
-        View.display(v);
+
         assertEquals(plus_left.tile(), get(g,2,-1));
         assertEquals(round_center.tile(), get(g,2,1));
         assertEquals(star_right.tile(), get(g,2,3));
 
     }
-    private void assertAtCorrectPosition(Grid g, TileAtPosition tile) {
+    private void assertAtCorrectPosition(TileAtPosition tile) {
         assertEquals(tile.tile(), get(grid, tile.row(), tile.col()));
     }
+
 
 }

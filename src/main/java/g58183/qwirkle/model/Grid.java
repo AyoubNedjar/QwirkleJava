@@ -1,18 +1,21 @@
 package g58183.qwirkle.model;
 
+import g58183.qwirkle.view.View;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Vector;
 
 public class Grid {
-    private Tile[][] tiles;
+    private final Tile[][] tiles;
     private boolean isEmpty;
 
     private static final int CENTRE = 45;
-    private static final int TAILLE = 91;
+    private static final int SIZE = 91;
 
     public Grid() {
-        this.tiles = new Tile[TAILLE][TAILLE];
+        this.tiles = new Tile[SIZE][SIZE];
         this.isEmpty = true;
     }
 
@@ -21,23 +24,19 @@ public class Grid {
         return tiles;
     }
 
-    public boolean getEmpty() {
-        return isEmpty;
-    }
-
     public void setEmpty(boolean empty) {
         isEmpty = empty;
     }
 
     /**
-     * Cette methode va permettre de connaitre la tuile présente à une position
+     * This method allows to know the tile present at a position.
      *
-     * @param row
-     * @param col
-     * @return
+     * @param row the row of the tile.
+     * @param col the column of the tile.
+     * @return the tile at the given position, or null if the position is out of bounds.
      */
     public Tile get(int row, int col) {
-        if (row < 0 || row > TAILLE || col < 0 || col > TAILLE) {
+        if (row < 0 || row >= SIZE || col < 0 || col >= SIZE) {
             return null;
         }
         return tiles[row][col];
@@ -54,7 +53,7 @@ public class Grid {
         if (!isEmpty()) {
             throw new QwirkleException("ce n'est pas le premier coup ");
         }
-        int ligne = d.getDeltaRow();
+        int row = d.getDeltaRow();
         int col = d.getDeltaColumn();
         int l = CENTRE;              // t,T,T
         int c = CENTRE;
@@ -88,9 +87,9 @@ public class Grid {
                 maliste.add(line[j]);
             }
 
-            for (int j = 0; j < line.length; j++) {//je peux mettre toutes les tuiles à la suite des autres vu que tout est ok
-                tiles[l][c] = line[j];
-                l += ligne;
+            for (Tile tile : line) {//je peux mettre toutes les tuiles à la suite des autres vu que tout est ok
+                tiles[l][c] = tile;
+                l += row;
                 c += col;
             }
         }
@@ -110,23 +109,23 @@ public class Grid {
      */
     public void add(int row, int col, Tile tile) throws QwirkleException {
         //vérifier si la coordonnée est correcte
-        if (row < 0 || row >= TAILLE || col < 0 || col >= TAILLE) {
-            throw new QwirkleException("La position ne se trouve pas sur le plateau.");
+        if (row < 0 || row >= SIZE || col < 0 || col >= SIZE) {
+            throw new QwirkleException(View.ORANGE+"La position ne se trouve pas sur le plateau."+View.RESET);
         }
 
         //vérifier si la case est vide
         if (tiles[row][col] != null) {
-            throw new QwirkleException("Une tuile existe déjà à cette position.");
+            throw new QwirkleException(View.ORANGE+"Une tuile existe déjà à cette position."+View.RESET);
         }
 
         //vérifier que la tuile a au moins un voisin valide
         if (!hasValidNeighbor(row, col, tile)) {
-            throw new QwirkleException("La tuile n'a pas de voisin valide.");
+            throw new QwirkleException(View.ORANGE+"La tuile n'a pas de voisin valide."+View.RESET);
         }
 
         //vérifier que la ligne ne contient pas plus de 6 tuiles et qu'il n'y a pas de doublon
-        if (!isValidNbAndDoublon(row, col, tile, 6)) {
-            throw new QwirkleException("La ligne contient déjà 6 tuiles ou la tuile créerait un doublon.");
+        if (!isValidNbAndDoublon(row, col, tile)) {
+            throw new QwirkleException(View.ORANGE+"La tuile créerait un doublon."+View.RESET);
         }
 
         tiles[row][col] = tile;
@@ -156,10 +155,9 @@ public class Grid {
      *
      * @param row  the row coordinate of the tile
      * @param col  the column coordinate of the tile
-     * @param tile the tile to check for neighbors
      * @return true if the tile has at least one adjacent neighbor, false otherwise
      */
-    private boolean hasNeighbor(int row, int col, Tile tile) {
+    private boolean hasNeighbor(int row, int col) {
         if (tiles[row][col - 1] != null) {
             return true;
         }
@@ -169,10 +167,7 @@ public class Grid {
         if (tiles[row - 1][col] != null) {
             return true;
         }
-        if (tiles[row + 1][col] != null) {
-            return true;
-        }
-        return false;
+        return tiles[row + 1][col] != null;
     }
 
     /**
@@ -200,7 +195,7 @@ public class Grid {
      * @return true if the tile has valid neighbors, false otherwise
      */
     private boolean hasValidNeighbor(int row, int col, Tile tile) {
-        return hasNeighbor(row, col, tile) && hasCorrectNeighbor(row, col, tile);
+        return hasNeighbor(row, col) && hasCorrectNeighbor(row, col, tile);
     }
 
 
@@ -234,7 +229,7 @@ public class Grid {
 
         while (get(lg, cln) != null && cptdir1 < max) {
             if (get(lg, cln).equals(tile)) { // check for duplicates
-                throw new QwirkleException("On ne peut pas avoir la meme tuile sur la meme ligne");
+                throw new QwirkleException(View.ORANGE+"On ne peut pas avoir la même tuile sur la meme ligne"+View.RESET);
             }
             cptdir1++;
             lg += deltaRow;
@@ -246,17 +241,14 @@ public class Grid {
 
         while (get(lgoposite, clnoppiste) != null && cptdir2 < max) {
             if (get(lgoposite, clnoppiste).equals(tile)) { // check for duplicates
-                throw new QwirkleException("On ne peut pas avoir la meme tuile sur la meme ligne");
+                throw new QwirkleException(View.ORANGE+"On ne peut pas avoir la meme tuile sur la meme ligne"+View.RESET);
             }
             cptdir2++;
             lgoposite += deltaRowOpposite;
             clnoppiste += deltaColumnOpposite;
         }
 
-        if ((cptdir1 + cptdir2) >= max) {
-            return false;
-        }
-        return true;
+        return (cptdir1 + cptdir2) < max;
     }
 
 
@@ -267,12 +259,11 @@ public class Grid {
      * @param row  the row index of the tile being placed
      * @param col  the column index of the tile being placed
      * @param tile the tile being placed
-     * @param max  the maximum number of tiles allowed on a line
      * @return true if there are no duplicates and the maximum number of tiles has not been exceeded, false otherwise
      */
-    private boolean isValidNbAndDoublon(int row, int col, Tile tile, int max) {
-        return isValidDoublonByAxe(row, col, tile, Direction.UP, max)
-                && isValidDoublonByAxe(row, col, tile, Direction.RIGHT, max);
+    private boolean isValidNbAndDoublon(int row, int col, Tile tile) {
+        return isValidDoublonByAxe(row, col, tile, Direction.UP, 6)
+                && isValidDoublonByAxe(row, col, tile, Direction.RIGHT, 6);
     }
 
 
@@ -310,17 +301,17 @@ public class Grid {
      * @throws QwirkleException if the tiles are not on the same row or column
      */
     public void add(TileAtPosition... tile) throws QwirkleException {
-        List<TileAtPosition> maliste = Arrays.stream(tile).toList();
+        List<TileAtPosition> myList = Arrays.stream(tile).toList();
 
         try {
             if (sameRowOrCol(tile)) {
-                placeTilesforthirdAdd(tile);
+                checkTilesAfterPosed(tile);
             } else {
-                throw new QwirkleException("Pas la même ligne ou colonne");
+                throw new QwirkleException(View.ORANGE+"Pas la même ligne ou colonne"+View.RESET);
             }
 
         } catch (QwirkleException e) {
-            maliste.stream().forEach(t -> tiles[t.row()][t.col()] = null);//reset previously placed tiles to null
+            myList.forEach(t -> tiles[t.row()][t.col()] = null);//reset previously placed tiles to null
             System.out.println(e.getMessage());
             throw e;
         } finally {
@@ -328,42 +319,47 @@ public class Grid {
         }
     }
 
-    private void placeTilesforthirdAdd(TileAtPosition... tile) {
-        List<TileAtPosition> maliste = Arrays.stream(tile).toList();
+    private void checkTilesAfterPosed(TileAtPosition... tile) throws QwirkleException{
+        List<TileAtPosition> myList = Arrays.stream(tile).toList();
         int cpt = 1;
 
         if (!caseVides(tile)) {//si les cases ne sont pas  vides
-            throw new QwirkleException("Il y'a déjà des tuiles à ces emplacement");
+            throw new QwirkleException(View.ORANGE+"Il y'a déjà des tuiles à ces emplacement"+View.RESET);
         }
         if (!isInBoard(tile)) {
-            throw new QwirkleException("La position ne se trouve pas sur le plateau.");
+            throw new QwirkleException(View.ORANGE+"La position ne se trouve pas sur le plateau."+View.RESET);
         }
 
-        maliste.stream().forEach(t -> tiles[t.row()][t.col()] = t.tile());//mettre toute les tuiles sur le plateau
-
-        for (TileAtPosition t : tile) {
-            if (!hasValidNeighbor(t.row(), t.col(), t.tile())) {
-                throw new QwirkleException("La tuile numéro " + cpt + " n'as pas de voisin valide.");
-            }
-            cpt++;
-        }
+        List<Boolean> isValid = new ArrayList<>();
 
         for (TileAtPosition t : tile) {
-            if (!isValidNbAndDoublon(t.row(), t.col(), t.tile(), 6)) {
-                throw new QwirkleException(" Il y'a un doublon dans la ligne");
+            //ici on enregistre juste un boolean qui nous informe si une tuiles a des voisins
+                isValid.add(hasValidNeighbor(t.row(), t.col(), t.tile()));
+        }
+
+        if(!isValid.contains(true)){//si il y a au moins une tuile qui a des voisins ,
+            throw new QwirkleException(View.ORANGE+"les tuiles mises ne sont reliées a aucune ligne"+View.RESET);
+        }
+
+        for (TileAtPosition t : tile) {
+            if (!isValidNbAndDoublon(t.row(), t.col(), t.tile())) {
+                throw new QwirkleException(View.ORANGE+" Il y'a un doublon dans la ligne"+View.RESET);
             }
         }
+
+        myList.forEach(t->tiles[t.row()][t.col()] = t.tile());
 
     }
 
-    private boolean isInBoard(TileAtPosition... tile) {
-        int row = 0;
-        int col = 0;
 
-        for (int i = 0; i < tile.length; i++) {
-            row = tile[i].row();
-            col = tile[i].col();
-            if (row < 0 || row >= TAILLE || col < 0 || col >= TAILLE) {
+    private boolean isInBoard(TileAtPosition... tile) {
+        int row ;
+        int col ;
+
+        for (TileAtPosition tileAtPosition : tile) {
+            row = tileAtPosition.row();
+            col = tileAtPosition.col();
+            if (row < 0 || row >= SIZE || col < 0 || col >= SIZE) {
                 return false;
             }
         }

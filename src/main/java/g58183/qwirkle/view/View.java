@@ -1,22 +1,35 @@
 package g58183.qwirkle.view;
 
+import static java.lang.System.out;
+
 import g58183.qwirkle.model.*;
-import java.util.ArrayList;
+
 import java.util.List;
 
-public abstract class View {
+public class View {
 
-    public static final String RESET = "\033[0m";  // Text Reset
+    public static final String RESET = "\033[0m";
     public static final String RED = "\033[0;31m";
     public static final String GREEN = "\033[0;32m";
     public static final String YELLOW = "\033[0;33m";
     public static final String BLUE = "\033[0;34m";
     public static final String PURPLE = "\033[0;35m";
-    public static final String ORANGE = "\033[38;2;204;85;0m";
+    public static final String ORANGE = "\u001B[38;5;208m";
+
+    public static final String YELLOW_BOLD = "\033[1;33m";
 
 
-
+    /**
+     * This method displays the game grid in a rectangular form with a border around it.
+     * <p>
+     * It finds the minimum and maximum coordinates for the tiles on the grid to determine
+     * the size of the grid to be displayed. Then it prints the tiles in the grid with the
+     * correct colors and shapes.
+     *
+     * @param grid the game grid to be displayed
+     */
     public static void display(GridView grid) {
+
         int minX = grid.getsize();
         int maxX = 0;
         int minY = grid.getsize();
@@ -26,7 +39,7 @@ public abstract class View {
         for (int i = 0; i < 91; i++) {
 
             for (int j = 0; j < 91; j++) {
-                if (grid.get(i,j) != null) {
+                if (grid.get(i, j) != null) {
                     minX = Math.min(minX, i);
                     maxX = Math.max(maxX, i);
                     minY = Math.min(minY, j);
@@ -37,9 +50,12 @@ public abstract class View {
             }
 
         }
-        System.out.println("--------------Le Plateau : -------------");
+        System.out.println("+-----------------------------+");
+        System.out.println("|         " + View.ORANGE + "Qwirkles" + View.RESET + "            |");
+        System.out.println("+-----------------------------+");
         for (int i = minX; i <= maxX; i++) {
-            System.out.print(i+" ");
+            out.print("|");
+            System.out.print(i + " ");
             for (int j = minY; j <= maxY; j++) {
                 Tile tile = grid.get(i, j);
                 if (tile == null) {
@@ -52,39 +68,38 @@ public abstract class View {
         }
         System.out.print("    ");
         for (int i = minY; i <= maxY; i++) {
-            System.out.print("" +i+ " ");
+            System.out.print("" + i + " ");
 
         }
         System.out.println();
-        System.out.println("--------------Le Plateau ---------------");
+        System.out.println("-------------------------------");
     }
 
+    /**
+     * This method converts a tile to a string representation with the correct color and shape.
+     *
+     * @param tile the tile to be converted
+     * @return a string representation of the tile
+     */
     private static String tileToRepresentation(Tile tile) {
         String color = RESET;
         switch (tile.color()) {
-            case BLUE -> {
-                color = BLUE;
-            }
-            case RED -> {
-                color = RED;
-            }
-            case GREEN -> {
-                color = GREEN;
-            }
-            case ORANGE -> {
-
-                color = ORANGE;
-            }
-            case YELLOW -> {
-                color = YELLOW;
-            }
-            case PURPLE -> {
-                color = PURPLE;
-            }
+            case BLUE -> color = BLUE;
+            case RED -> color = RED;
+            case GREEN -> color = GREEN;
+            case ORANGE -> color = ORANGE;
+            case YELLOW -> color = YELLOW;
+            case PURPLE -> color = PURPLE;
         }
         return color + toGiveShapeTile(tile) + RESET;
     }
 
+    /**
+     * This method converts a tile's shape to a string representation.
+     *
+     * @param tile the tile to be converted
+     * @return a string representation of the tile's shape
+     */
     private static String toGiveShapeTile(Tile tile) {
         switch (tile.shape()) {
 
@@ -111,8 +126,14 @@ public abstract class View {
     }
 
 
-    public static void display(String nameplayer, List<Tile> playerHand){ // CHANGER ici
-
+    /**
+     * This method displays a player's hand with the tiles' colors and shapes.
+     *
+     * @param nameplayer the name of the player
+     * @param playerHand the hand of the player
+     */
+    public static void display(String nameplayer, List<Tile> playerHand) {
+        System.out.println();
         System.out.println("Joueur : " + nameplayer);
         System.out.print("Main { : ");
         for (Tile tile : playerHand) {
@@ -122,29 +143,56 @@ public abstract class View {
         System.out.print("Index  :  ");
 
         for (int i = 1; i < 7; i++) {
-            System.out.print(i+ "  ");
+            System.out.print(i + "  ");
         }
         System.out.println();
-        System.out.println(">");
+
     }
 
 
     public static void displayHelp() {
-        String h = "Qwirkle command: choisissez ce que vous voulez jouer : \n"
-                + " -play 1 tile : o <row> <col> <i>\n"
-                + " -play line: l <row> <col> <direction> <i1> [<i2>]\n"
-                + " -play plic-ploc : m <row1> <col1> <i1> [<row2> <col2> <i2>]\n"
-                + " -play first : f <i1> [<i2>]\n"
-                + " -pass : p\n"
-                + " -quit : q\n"
-                + " -i : index in list of tiles\n"
-                + " -direction in l (left), r (right), u (up), d(down)\n" +
-                "Entrez votre choix : ";
-        System.out.println(h);
+        // Définir le texte avec les lettres de commande en jaune
+        String text = String.format(
+                "Qwirkle command: choisissez ce que vous voulez jouer :\n"
+                        + " -play 1 tile : %s'o'%s\n"
+                        + " -play line: %sl%s\n"
+                        + " -play plic-ploc : %sm%s\n"
+                        + " -play first : %sf%s\n"
+                        + " -pass : %sp%s\n"
+                        + " -quit : %sq%s\n"
+                        + "Entrez votre choix :\n",
+                YELLOW_BOLD, RESET, YELLOW_BOLD, RESET, YELLOW_BOLD, RESET,
+                YELLOW_BOLD, RESET, YELLOW_BOLD, RESET, YELLOW_BOLD, RESET
+        );
+
+        out.println(text);
     }
 
     public static void displayError(String message) {
         System.out.println(message);
+    }
+    public static void displayTitle(){
+        /*System.out.println("\n\n\n");
+        System.out.println(View.BLUE + "****************************************************"
+                + "********************************************" + View.RESET);
+        System.out.println("              *              " + ORANGE + "Q"+
+                "     W     I     R     K     L     E");
+        System.out.println(View.BLUE + "****************************************************"
+                + "********************************************" + View.RESET);
+*/
+        System.out.println("+--------------------------------------+");
+        System.out.println("|                                      |");
+        System.out.println("|      Welcome to the game of          |");
+        System.out.println("|                                      |");
+        System.out.println("|            "+View.ORANGE+"Qwirkles"+View.RESET+"                  |");
+        System.out.println("|                                      |");
+        System.out.println("|      "+View.BLUE+"A game of strategy and"+View.RESET+"          |");
+        System.out.println("|      "+View.BLUE+"matching that will test"+View.RESET+"         |");
+        System.out.println("|        "+View.BLUE+"your skills and wit."+View.RESET+"          |");
+        System.out.println("|                                      |");
+        System.out.println("+--------------------------------------+");
+        System.out.println();
+
     }
 
 }

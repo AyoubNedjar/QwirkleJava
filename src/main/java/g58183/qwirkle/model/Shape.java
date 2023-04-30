@@ -5,6 +5,6 @@ package g58183.qwirkle.model;
  */
 public enum Shape {
 
-    CROSS,SQUARE,ROUND,STAR,PLUS,DIAMOND;
+    CROSS,SQUARE,ROUND,STAR,PLUS,DIAMOND
 
 }
