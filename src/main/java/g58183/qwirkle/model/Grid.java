@@ -311,7 +311,6 @@ public class Grid {
             }
 
         } catch (QwirkleException e) {
-            myList.forEach(t -> tiles[t.row()][t.col()] = null);//reset previously placed tiles to null
             System.out.println(e.getMessage());
             throw e;
         } finally {
@@ -407,6 +406,8 @@ public class Grid {
         }
         return true;
     }
+
+
 
 
 }

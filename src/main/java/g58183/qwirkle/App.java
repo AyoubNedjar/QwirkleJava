@@ -12,6 +12,7 @@ public class App {
     private static View view;
 
     public static void main(String[] args) {
+
         int nb = 0;
         View.displayTitle();
         System.out.println("Combien de joueurs vont jouer ? : ");
@@ -37,7 +38,7 @@ public class App {
 
                 boolean ok = true;
                 while (ok) {
-                    try {
+                    try {//TODO vérifier juste pour la methode de choix que la taille de clavier == 1
                         View.display(game.getCurrentPlayer().getNom(), game.getCurrentPlayerHand());//affiche la main du joueur courant
                         char choice = askMethod();//demande la methode choisie en vérifiant bien les commandes entrées.
                         isGameOver = playChoice(choice, isGameOver);
@@ -45,7 +46,7 @@ public class App {
                         ok = false;
 
                     } catch (QwirkleException e) {
-                        view.displayError(View.RED+e.getMessage()+View.RESET);
+                        //view.displayError(View.RED+e.getMessage()+View.RESET);
                         view.displayError(View.RED+"Coup invalide rééssayer!"+View.RESET);
                         View.display(game.getGrid());
                     } finally {
@@ -145,7 +146,7 @@ public class App {
         int number = -1;
         Scanner clavier = new Scanner(System.in);;
         do {
-            try {
+            //try {
                 if (!message.equals("")) {
                     System.out.print(message);
                 }
@@ -160,12 +161,12 @@ public class App {
                     ok = false;
                 }
 
-            } catch (InputMismatchException e) {
+            /*} catch (InputMismatchException e) {
                 System.out.println(View.ORANGE+"veuillez entrez un numéro svp"+View.RESET);
             }catch (QwirkleException e){
                 System.out.println(View.ORANGE+"Vous avez rentré un espace , réésayez ! "+View.RESET);
 
-            }
+            }*/
         } while (ok);
         return number;
     }
@@ -349,6 +350,9 @@ public class App {
                    Scanner clavier = new Scanner(System.in);
                    System.out.print("Entrez le nom du joueur numéro " + (i + 1)+": ");
                    name = clavier.nextLine();
+                   if(names.contains(name.trim())){
+                       throw new QwirkleException(View.ORANGE+"Un joueur a le même nom que vous, tapez des noms différents pour les différents joueurs"+View.RESET);
+                   }
                    checkName(name);
                    names.add(name);
                    i++;

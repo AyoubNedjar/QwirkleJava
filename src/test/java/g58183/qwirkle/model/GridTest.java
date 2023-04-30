@@ -1393,6 +1393,457 @@ class GridTest {
     private void assertAtCorrectPosition(TileAtPosition tile) {
         assertEquals(tile.tile(), get(grid, tile.row(), tile.col()));
     }
+    //-----------------------------------------------------------------
+    @Test
+    void add_TAP_Example_J_ADD_Good() {
+        Grid grid = new Grid();
+
+        //1
+        Tile t1 = new Tile(RED, ROUND);
+        Tile t2 = new Tile(RED, DIAMOND);
+        Tile t3 = new Tile(RED, PLUS);
+        grid.firstAdd(UP, t1, t2, t3);
+        assertEquals(t1, grid.get(45, 45));
+        assertEquals(t2, grid.get(44, 45));
+        assertEquals(t3, grid.get(43, 45));
+
+        //2
+        Tile t4 = new Tile(RED, SQUARE);
+        Tile t5 = new Tile(BLUE, SQUARE);
+        Tile t6 = new Tile(PURPLE, SQUARE);
+        grid.add(46, 45, RIGHT, t4, t5, t6);
+        assertEquals(t4, grid.get(46, 45));
+        assertEquals(t5, grid.get(46, 46));
+        assertEquals(t6, grid.get(46, 47));
+
+        //3
+        Tile t7 = new Tile(BLUE, ROUND);
+        grid.add(45, 46, t7);
+        assertEquals(t6, grid.get(46, 47));
+
+        //4
+        Tile t8 = new Tile(GREEN, PLUS);
+        Tile t9 = new Tile(GREEN, DIAMOND);
+        grid.add(43, 44, DOWN, t8, t9);
+        assertEquals(t8, grid.get(43, 44));
+        assertEquals(t9, grid.get(44, 44));
+
+        //5
+        TileAtPosition t10 = new TileAtPosition(42, 44, new Tile(GREEN, STAR));
+        TileAtPosition t11 = new TileAtPosition(45, 44, new Tile(GREEN, ROUND));
+        grid.add(t10, t11);
+        assertEquals(grid.get(t10.row(), t10.col()), t10.tile());
+        assertEquals(grid.get(t11.row(), t11.col()), t11.tile());
+
+        //6
+        Tile t12 = new Tile(ORANGE, SQUARE);
+        Tile t13 = new Tile(RED, SQUARE);
+        grid.add(46, 48, DOWN, t12, t13);
+        assertEquals(grid.get(46, 48), t12);
+        assertEquals(grid.get(47, 48), t13);
+
+        //7
+        Tile t14 = new Tile(YELLOW, STAR);
+        Tile t15 = new Tile(ORANGE, STAR);
+        grid.add(42, 43, LEFT, t14, t15);
+        assertEquals(grid.get(42, 43), t14);
+        assertEquals(grid.get(42, 42), t15);
+
+        //8
+        Tile t16 = new Tile(ORANGE, CROSS);
+        Tile t17 = new Tile(ORANGE, DIAMOND);
+        grid.add(43, 42, DOWN, t16, t17);
+        assertEquals(grid.get(43, 42), t16);
+        assertEquals(grid.get(44, 42), t17);
+
+        //9
+        Tile t18 = new Tile(YELLOW, DIAMOND);
+        Tile t19 = new Tile(YELLOW, ROUND);
+        grid.add(44, 43, DOWN, t18, t19);
+        assertEquals(grid.get(44, 43), t18);
+        assertEquals(grid.get(45, 43), t19);
+
+        //10
+        Tile t20 = new Tile(RED, STAR);
+        grid.add(42, 45, t20);
+        assertEquals(grid.get(42, 45), t20);
+    }
+
+    @Test
+    void add_TAP_Example_J_VAR_Good() {
+        Grid grid = new Grid();
+
+        //1
+        Tile t1 = new Tile(RED, ROUND);
+        Tile t2 = new Tile(RED, DIAMOND);
+        Tile t3 = new Tile(RED, PLUS);
+        grid.firstAdd(UP, t1, t2, t3);
+        assertEquals(t1, grid.get(45, 45));
+        assertEquals(t2, grid.get(44, 45));
+        assertEquals(t3, grid.get(43, 45));
+
+        //2
+        Tile t4 = new Tile(RED, SQUARE);
+        Tile t5 = new Tile(BLUE, SQUARE);
+        Tile t6 = new Tile(PURPLE, SQUARE);
+        grid.add(46, 45, RIGHT, t4, t5, t6);
+        assertEquals(t4, grid.get(46, 45));
+        assertEquals(t5, grid.get(46, 46));
+        assertEquals(t6, grid.get(46, 47));
+
+        //3
+        Tile t7 = new Tile(BLUE, ROUND);
+        grid.add(45, 46, t7);
+        assertEquals(t6, grid.get(46, 47));
+
+        //4
+        Tile t8 = new Tile(GREEN, PLUS);
+        Tile t9 = new Tile(GREEN, DIAMOND);
+        grid.add(43, 44, DOWN, t8, t9);
+        assertEquals(t8, grid.get(43, 44));
+        assertEquals(t9, grid.get(44, 44));
+
+        //5
+        TileAtPosition t10 = new TileAtPosition(42, 44, new Tile(GREEN, STAR));
+        TileAtPosition t11 = new TileAtPosition(45, 44, new Tile(GREEN, ROUND));
+        grid.add(t10, t11);
+        assertEquals(grid.get(t10.row(), t10.col()), t10.tile());
+        assertEquals(grid.get(t11.row(), t11.col()), t11.tile());
+
+        //6
+        Tile t12 = new Tile(ORANGE, SQUARE);
+        Tile t13 = new Tile(RED, SQUARE);
+        grid.add(46, 48, DOWN, t12, t13);
+        assertEquals(grid.get(46, 48), t12);
+        assertEquals(grid.get(47, 48), t13);
+
+        //7
+        Tile t14 = new Tile(YELLOW, STAR);
+        Tile t15 = new Tile(ORANGE, STAR);
+        grid.add(42, 43, LEFT, t14, t15);
+        assertEquals(grid.get(42, 43), t14);
+        assertEquals(grid.get(42, 42), t15);
+
+        //8
+        Tile t16 = new Tile(ORANGE, CROSS);
+        Tile t17 = new Tile(ORANGE, DIAMOND);
+        grid.add(43, 42, DOWN, t16, t17);
+        assertEquals(grid.get(43, 42), t16);
+        assertEquals(grid.get(44, 42), t17);
+
+        //9
+        Tile t18 = new Tile(YELLOW, DIAMOND);
+        Tile t19 = new Tile(YELLOW, ROUND);
+        grid.add(44, 43, DOWN, t18, t19);
+        assertEquals(grid.get(44, 43), t18);
+        assertEquals(grid.get(45, 43), t19);
+
+        //10
+        Tile t20 = new Tile(RED, STAR);
+        grid.add(42, 45, LEFT, t20);
+        assertEquals(grid.get(42, 45), t20);
+    }
+
+    @Test
+    void add_TAP_Example_J_TAP_Good() {
+        Grid grid = new Grid();
+
+        //1
+        Tile t1 = new Tile(RED, ROUND);
+        Tile t2 = new Tile(RED, DIAMOND);
+        Tile t3 = new Tile(RED, PLUS);
+        grid.firstAdd(UP, t1, t2, t3);
+        assertEquals(t1, grid.get(45, 45));
+        assertEquals(t2, grid.get(44, 45));
+        assertEquals(t3, grid.get(43, 45));
+
+        //2
+        Tile t4 = new Tile(RED, SQUARE);
+        Tile t5 = new Tile(BLUE, SQUARE);
+        Tile t6 = new Tile(PURPLE, SQUARE);
+        grid.add(46, 45, RIGHT, t4, t5, t6);
+        assertEquals(t4, grid.get(46, 45));
+        assertEquals(t5, grid.get(46, 46));
+        assertEquals(t6, grid.get(46, 47));
+
+        //3
+        Tile t7 = new Tile(BLUE, ROUND);
+        grid.add(45, 46, t7);
+        assertEquals(t6, grid.get(46, 47));
+
+        //4
+        Tile t8 = new Tile(GREEN, PLUS);
+        Tile t9 = new Tile(GREEN, DIAMOND);
+        grid.add(43, 44, DOWN, t8, t9);
+        assertEquals(t8, grid.get(43, 44));
+        assertEquals(t9, grid.get(44, 44));
+
+        //5
+        TileAtPosition t10 = new TileAtPosition(42, 44, new Tile(GREEN, STAR));
+        TileAtPosition t11 = new TileAtPosition(45, 44, new Tile(GREEN, ROUND));
+        grid.add(t10, t11);
+        assertEquals(grid.get(t10.row(), t10.col()), t10.tile());
+        assertEquals(grid.get(t11.row(), t11.col()), t11.tile());
+
+        //6
+        Tile t12 = new Tile(ORANGE, SQUARE);
+        Tile t13 = new Tile(RED, SQUARE);
+        grid.add(46, 48, DOWN, t12, t13);
+        assertEquals(grid.get(46, 48), t12);
+        assertEquals(grid.get(47, 48), t13);
+
+        //7
+        Tile t14 = new Tile(YELLOW, STAR);
+        Tile t15 = new Tile(ORANGE, STAR);
+        grid.add(42, 43, LEFT, t14, t15);
+        assertEquals(grid.get(42, 43), t14);
+        assertEquals(grid.get(42, 42), t15);
+
+        //8
+        Tile t16 = new Tile(ORANGE, CROSS);
+        Tile t17 = new Tile(ORANGE, DIAMOND);
+        grid.add(43, 42, DOWN, t16, t17);
+        assertEquals(grid.get(43, 42), t16);
+        assertEquals(grid.get(44, 42), t17);
+
+        //9
+        Tile t18 = new Tile(YELLOW, DIAMOND);
+        Tile t19 = new Tile(YELLOW, ROUND);
+        grid.add(44, 43, DOWN, t18, t19);
+        assertEquals(grid.get(44, 43), t18);
+        assertEquals(grid.get(45, 43), t19);
+
+        //10
+        TileAtPosition t20 = new TileAtPosition(42, 45, new Tile(RED, STAR));
+        grid.add(t20);
+        assertEquals(grid.get(t20.row(), t20.col()), t20.tile());
+    }
+
+    @Test
+    void add_TAP_Example_J_ADD_Bad() {
+        Grid grid = new Grid();
+
+        //1
+        Tile t1 = new Tile(RED, ROUND);
+        Tile t2 = new Tile(RED, DIAMOND);
+        Tile t3 = new Tile(RED, PLUS);
+        grid.firstAdd(UP, t1, t2, t3);
+        assertEquals(t1, grid.get(45, 45));
+        assertEquals(t2, grid.get(44, 45));
+        assertEquals(t3, grid.get(43, 45));
+
+        //2
+        Tile t4 = new Tile(RED, SQUARE);
+        Tile t5 = new Tile(BLUE, SQUARE);
+        Tile t6 = new Tile(PURPLE, SQUARE);
+        grid.add(46, 45, RIGHT, t4, t5, t6);
+        assertEquals(t4, grid.get(46, 45));
+        assertEquals(t5, grid.get(46, 46));
+        assertEquals(t6, grid.get(46, 47));
+
+        //3
+        Tile t7 = new Tile(BLUE, ROUND);
+        grid.add(45, 46, t7);
+        assertEquals(t6, grid.get(46, 47));
+
+        //4
+        Tile t8 = new Tile(GREEN, PLUS);
+        Tile t9 = new Tile(GREEN, DIAMOND);
+        grid.add(43, 44, DOWN, t8, t9);
+        assertEquals(t8, grid.get(43, 44));
+        assertEquals(t9, grid.get(44, 44));
+
+        //5
+        TileAtPosition t10 = new TileAtPosition(42, 44, new Tile(GREEN, STAR));
+        TileAtPosition t11 = new TileAtPosition(45, 44, new Tile(GREEN, ROUND));
+        grid.add(t10, t11);
+        assertEquals(grid.get(t10.row(), t10.col()), t10.tile());
+        assertEquals(grid.get(t11.row(), t11.col()), t11.tile());
+
+        //6
+        Tile t12 = new Tile(ORANGE, SQUARE);
+        Tile t13 = new Tile(RED, SQUARE);
+        grid.add(46, 48, DOWN, t12, t13);
+        assertEquals(grid.get(46, 48), t12);
+        assertEquals(grid.get(47, 48), t13);
+
+        //7
+        Tile t14 = new Tile(YELLOW, STAR);
+        Tile t15 = new Tile(ORANGE, STAR);
+        grid.add(42, 43, LEFT, t14, t15);
+        assertEquals(grid.get(42, 43), t14);
+        assertEquals(grid.get(42, 42), t15);
+
+        //8
+        Tile t16 = new Tile(ORANGE, CROSS);
+        Tile t17 = new Tile(ORANGE, DIAMOND);
+        grid.add(43, 42, DOWN, t16, t17);
+        assertEquals(grid.get(43, 42), t16);
+        assertEquals(grid.get(44, 42), t17);
+
+        //9
+        Tile t18 = new Tile(YELLOW, DIAMOND);
+        Tile t19 = new Tile(YELLOW, ROUND);
+        grid.add(44, 43, DOWN, t18, t19);
+        assertEquals(grid.get(44, 43), t18);
+        assertEquals(grid.get(45, 43), t19);
+
+        //10
+        Tile t20 = new Tile(GREEN, STAR);
+        assertThrows(QwirkleException.class, () -> grid.add(42, 45, t20));
+        assertNull(grid.get(42, 45));
+    }
+
+    @Test
+    void add_TAP_Example_J_VAR_Bad() {
+        Grid grid = new Grid();
+
+        //1
+        Tile t1 = new Tile(RED, ROUND);
+        Tile t2 = new Tile(RED, DIAMOND);
+        Tile t3 = new Tile(RED, PLUS);
+        grid.firstAdd(UP, t1, t2, t3);
+        assertEquals(t1, grid.get(45, 45));
+        assertEquals(t2, grid.get(44, 45));
+        assertEquals(t3, grid.get(43, 45));
+
+        //2
+        Tile t4 = new Tile(RED, SQUARE);
+        Tile t5 = new Tile(BLUE, SQUARE);
+        Tile t6 = new Tile(PURPLE, SQUARE);
+        grid.add(46, 45, RIGHT, t4, t5, t6);
+        assertEquals(t4, grid.get(46, 45));
+        assertEquals(t5, grid.get(46, 46));
+        assertEquals(t6, grid.get(46, 47));
+
+        //3
+        Tile t7 = new Tile(BLUE, ROUND);
+        grid.add(45, 46, t7);
+        assertEquals(t6, grid.get(46, 47));
+
+        //4
+        Tile t8 = new Tile(GREEN, PLUS);
+        Tile t9 = new Tile(GREEN, DIAMOND);
+        grid.add(43, 44, DOWN, t8, t9);
+        assertEquals(t8, grid.get(43, 44));
+        assertEquals(t9, grid.get(44, 44));
+
+        //5
+        TileAtPosition t10 = new TileAtPosition(42, 44, new Tile(GREEN, STAR));
+        TileAtPosition t11 = new TileAtPosition(45, 44, new Tile(GREEN, ROUND));
+        grid.add(t10, t11);
+        assertEquals(grid.get(t10.row(), t10.col()), t10.tile());
+        assertEquals(grid.get(t11.row(), t11.col()), t11.tile());
+
+        //6
+        Tile t12 = new Tile(ORANGE, SQUARE);
+        Tile t13 = new Tile(RED, SQUARE);
+        grid.add(46, 48, DOWN, t12, t13);
+        assertEquals(grid.get(46, 48), t12);
+        assertEquals(grid.get(47, 48), t13);
+
+        //7
+        Tile t14 = new Tile(YELLOW, STAR);
+        Tile t15 = new Tile(ORANGE, STAR);
+        grid.add(42, 43, LEFT, t14, t15);
+        assertEquals(grid.get(42, 43), t14);
+        assertEquals(grid.get(42, 42), t15);
+
+        //8
+        Tile t16 = new Tile(ORANGE, CROSS);
+        Tile t17 = new Tile(ORANGE, DIAMOND);
+        grid.add(43, 42, DOWN, t16, t17);
+        assertEquals(grid.get(43, 42), t16);
+        assertEquals(grid.get(44, 42), t17);
+
+        //9
+        Tile t18 = new Tile(YELLOW, DIAMOND);
+        Tile t19 = new Tile(YELLOW, ROUND);
+        grid.add(44, 43, DOWN, t18, t19);
+        assertEquals(grid.get(44, 43), t18);
+        assertEquals(grid.get(45, 43), t19);
+
+        //10
+        Tile t20 = new Tile(ORANGE, STAR);
+        assertThrows(QwirkleException.class, () -> grid.add(42, 45, LEFT, t20));
+        assertNull(grid.get(42, 45));
+    }
+
+    @Test
+    void add_TAP_Example_J_TAP_Bad() {
+        Grid grid = new Grid();
+
+        //1
+        Tile t1 = new Tile(RED, ROUND);
+        Tile t2 = new Tile(RED, DIAMOND);
+        Tile t3 = new Tile(RED, PLUS);
+        grid.firstAdd(UP, t1, t2, t3);
+        assertEquals(t1, grid.get(45, 45));
+        assertEquals(t2, grid.get(44, 45));
+        assertEquals(t3, grid.get(43, 45));
+
+        //2
+        Tile t4 = new Tile(RED, SQUARE);
+        Tile t5 = new Tile(BLUE, SQUARE);
+        Tile t6 = new Tile(PURPLE, SQUARE);
+        grid.add(46, 45, RIGHT, t4, t5, t6);
+        assertEquals(t4, grid.get(46, 45));
+        assertEquals(t5, grid.get(46, 46));
+        assertEquals(t6, grid.get(46, 47));
+
+        //3
+        Tile t7 = new Tile(BLUE, ROUND);
+        grid.add(45, 46, t7);
+        assertEquals(t6, grid.get(46, 47));
+
+        //4
+        Tile t8 = new Tile(GREEN, PLUS);
+        Tile t9 = new Tile(GREEN, DIAMOND);
+        grid.add(43, 44, DOWN, t8, t9);
+        assertEquals(t8, grid.get(43, 44));
+        assertEquals(t9, grid.get(44, 44));
+
+        //5
+        TileAtPosition t10 = new TileAtPosition(42, 44, new Tile(GREEN, STAR));
+        TileAtPosition t11 = new TileAtPosition(45, 44, new Tile(GREEN, ROUND));
+        grid.add(t10, t11);
+        assertEquals(grid.get(t10.row(), t10.col()), t10.tile());
+        assertEquals(grid.get(t11.row(), t11.col()), t11.tile());
+
+        //6
+        Tile t12 = new Tile(ORANGE, SQUARE);
+        Tile t13 = new Tile(RED, SQUARE);
+        grid.add(46, 48, DOWN, t12, t13);
+        assertEquals(grid.get(46, 48), t12);
+        assertEquals(grid.get(47, 48), t13);
+
+        //7
+        Tile t14 = new Tile(YELLOW, STAR);
+        Tile t15 = new Tile(ORANGE, STAR);
+        grid.add(42, 43, LEFT, t14, t15);
+        assertEquals(grid.get(42, 43), t14);
+        assertEquals(grid.get(42, 42), t15);
+
+        //8
+        Tile t16 = new Tile(ORANGE, CROSS);
+        Tile t17 = new Tile(ORANGE, DIAMOND);
+        grid.add(43, 42, DOWN, t16, t17);
+        assertEquals(grid.get(43, 42), t16);
+        assertEquals(grid.get(44, 42), t17);
+
+        //9
+        Tile t18 = new Tile(YELLOW, DIAMOND);
+        Tile t19 = new Tile(YELLOW, ROUND);
+        grid.add(44, 43, DOWN, t18, t19);
+        assertEquals(grid.get(44, 43), t18);
+        assertEquals(grid.get(45, 43), t19);
+
+        //10
+        TileAtPosition t20 = new TileAtPosition(42, 45, new Tile(RED, ROUND));
+        assertThrows(QwirkleException.class, () -> grid.add(t20));
+        assertNull(grid.get(t20.row(), t20.col()));
+    }
+
 
 
 }
