@@ -1,5 +1,7 @@
 package g58183.qwirkle.model;
 
+import g58183.qwirkle.view.View;
+
 import java.util.List;
 
 public class Game {
@@ -26,7 +28,7 @@ public class Game {
      * @param d  the direction in which to place the tiles
      * @param is the indices of the tiles in the player's hand
      */
-    public void first(Direction d, int... is) {//2,4,1
+    public void first(Direction d, int... is) throws QwirkleException{//2,4,1
 
         Tile[] tab = new Tile[is.length];// le nb de tuiles qu'il veut placer
         List<Tile> maliste = getCurrentPlayerHand();
@@ -41,7 +43,7 @@ public class Game {
             player[current].refill();
            pass();
         } catch (QwirkleException e) {
-            System.out.println(e.getMessage());
+            System.out.println(View.RED+e.getMessage()+View.RESET);
         }
 
 
@@ -56,7 +58,7 @@ public class Game {
      * @param col   the column coordinate of the tile
      * @param index the index of the tile in the player's hand
      */
-    public void play(int row, int col, int index) {
+    public void play(int row, int col, int index) throws QwirkleException{
         try {
 
             List<Tile> maliste = getCurrentPlayerHand();
@@ -66,7 +68,7 @@ public class Game {
             player[current].refill();
             pass();
         } catch (QwirkleException e) {
-            System.out.println(e.getMessage());
+            System.out.println(View.RED+e.getMessage()+View.RESET);
 
         }
 
@@ -81,7 +83,7 @@ public class Game {
      * @param d       the direction in which to place the tiles
      * @param indexes the indices of the tiles in the player's hand
      */
-    public void play(int row, int col, Direction d, int... indexes) {
+    public void play(int row, int col, Direction d, int... indexes) throws QwirkleException {
         try {
 
             List<Tile> maliste = getCurrentPlayerHand();
@@ -96,7 +98,7 @@ public class Game {
             player[current].refill();
             pass();
         } catch (QwirkleException e) {
-            System.out.println(e.getMessage());
+            System.out.println(View.RED+e.getMessage()+View.RESET);
         }
     }
 
@@ -109,7 +111,7 @@ public class Game {
      * @throws QwirkleException if the length of the is array is less than 3 or not a multiple of 3,
      *                          or if any of the positions specified are invalid or if the player tries to play an invalid move.
      */
-    public void play(int... is) {//48,51,1,47,51,3
+    public void play(int... is) throws QwirkleException{//48,51,1,47,51,3
 
         if (is.length < 3 || is.length % 3 != 0) {
             throw new QwirkleException("arguments invalides");
@@ -136,7 +138,7 @@ public class Game {
 
             pass();
         } catch (QwirkleException e) {
-            System.out.println(e.getMessage());
+            System.out.println(View.RED+e.getMessage()+View.RESET);
         }
 
 

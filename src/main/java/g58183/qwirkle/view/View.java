@@ -134,7 +134,7 @@ public class View {
      */
     public static void display(String nameplayer, List<Tile> playerHand) {
         System.out.println();
-        System.out.println("Joueur : " + nameplayer);
+        System.out.println(View.GREEN+"C'est au tour du joueur "+nameplayer+View.RESET);
         System.out.print("Main { : ");
         for (Tile tile : playerHand) {
             System.out.print(tileToRepresentation(tile));
@@ -168,9 +168,18 @@ public class View {
         out.println(text);
     }
 
+    /**
+
+     Displays an error message on the console.
+     @param message The error message to display.
+     */
     public static void displayError(String message) {
         System.out.println(message);
     }
+    /**
+
+     Displays the game title on the console.
+     */
     public static void displayTitle(){
         /*System.out.println("\n\n\n");
         System.out.println(View.BLUE + "****************************************************"
