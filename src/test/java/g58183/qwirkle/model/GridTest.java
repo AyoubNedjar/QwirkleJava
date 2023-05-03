@@ -1845,5 +1845,26 @@ class GridTest {
     }
 
 
+    @Test
+    void testScore(){
+        Grid grid = new Grid();
+
+        //1
+        Tile t1 = new Tile(RED, ROUND);
+        Tile t2 = new Tile(RED, DIAMOND);
+        Tile t3 = new Tile(RED, PLUS);
+        int result = grid.firstAdd(UP, t1, t2, t3);
+       assertEquals(3,result);
+
+        //2
+        Tile t4 = new Tile(RED, SQUARE);
+        Tile t5 = new Tile(BLUE, SQUARE);
+
+
+        int res =grid.add(46, 45, RIGHT, t4, t5);
+       assertEquals(2,res);
+
+    }
+
 
 }

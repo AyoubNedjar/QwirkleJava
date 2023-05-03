@@ -49,10 +49,7 @@ public class Grid {
      * the game board (the first tile will be placed in 45.45)
      * varargs for divers tiles
      */
-    public void firstAdd(Direction d, Tile... line) throws QwirkleException {
-        if (!isEmpty()) {
-            throw new QwirkleException(View.ORANGE + "Ce n'est pas le premier coup " + View.RESET);
-        }
+    public int firstAdd(Direction d, Tile... line) throws QwirkleException {
         int row = d.getDeltaRow();
         int col = d.getDeltaColumn();
         int l = CENTRE;              // t,T,T
@@ -60,9 +57,15 @@ public class Grid {
         Color couleur = null;
         Shape forme = null;
         List<Tile> maliste = new ArrayList<>();
+        int score = 0;
+
+        if (!isEmpty()) {
+            throw new QwirkleException(View.ORANGE + "Ce n'est pas le premier coup " + View.RESET);
+        }
 
         if (line.length == 1) {
             tiles[l][c] = line[0];
+            score++;
         } else {
 
             //vérification des doublons/couleur ou shape
@@ -91,8 +94,10 @@ public class Grid {
                 tiles[l][c] = tile;
                 l += row;
                 c += col;
+                score++;
             }
         }
+        return score;
 
     }
 
@@ -107,7 +112,7 @@ public class Grid {
      * @throws QwirkleException if the position is invalid or does not satisfy
      *                          the game rules
      */
-    public void add(int row, int col, Tile tile) throws QwirkleException {
+    public int add(int row, int col, Tile tile) throws QwirkleException {
         //vérifier si la coordonnée est correcte
         if (row < 0 || row >= SIZE || col < 0 || col >= SIZE) {
             throw new QwirkleException(View.ORANGE + "La position ne se trouve pas sur le plateau." + View.RESET);
@@ -129,6 +134,7 @@ public class Grid {
         }
 
         tiles[row][col] = tile;
+        return 1;
     }
 
     /**
@@ -275,14 +281,16 @@ public class Grid {
      * @param d    the direction in which to place the tiles
      * @param line the tiles to be placed
      */
-    public void add(int row, int col, Direction d, Tile... line) {
+    public int add(int row, int col, Direction d, Tile... line) {
 
         int deltaRow = d.getDeltaRow();
         int deltaColumn = d.getDeltaColumn();
         int lg = row;
         int cln = col;
+        int score = 0;
 
         add(lg, cln, line[0]);
+        score++;
         lg += deltaRow;
         cln += deltaColumn;
 
@@ -290,7 +298,9 @@ public class Grid {
             add(lg, cln, line[i]);
             lg += deltaRow;
             cln += deltaColumn;
+            score++;
         }
+        return score;
     }
 
     /**
@@ -300,8 +310,8 @@ public class Grid {
      * @param tile the tiles to be placed
      * @throws QwirkleException if the tiles are not on the same row or column
      */
-    public void add(TileAtPosition... tile) throws QwirkleException {
-        List<TileAtPosition> myList = Arrays.stream(tile).toList();
+    public int add(TileAtPosition... tile) throws QwirkleException {
+
 
         if (containsDoublonsBeforeToPlace(tile)) {
             throw new QwirkleException("Il ne peut pas avoir la même tuile sur la même ligne");
@@ -309,6 +319,7 @@ public class Grid {
         try {
             if (sameRowOrCol(tile)) {
                 checkTilesAfterPosed(tile);
+                return tile.length;
             } else {
                 throw new QwirkleException(View.ORANGE + "Pas la même ligne ou colonne" + View.RESET);
             }
@@ -356,6 +367,7 @@ public class Grid {
         }
 
         myList.forEach(t -> tiles[t.row()][t.col()] = t.tile());
+
     }
 
     /**
