@@ -29,7 +29,7 @@ public class Game {
      * @param is the indices of the tiles in the player's hand
      */
     public void first(Direction d, int... is) throws QwirkleException{//2,4,1
-
+        int score;
         Tile[] tab = new Tile[is.length];// le nb de tuiles qu'il veut placer
         List<Tile> maliste = getCurrentPlayerHand();
 
@@ -38,7 +38,8 @@ public class Game {
             tab[i] = maliste.get(is[i]);//is[i] donne l'indice des tuiles
         }
         try {
-            grid.firstAdd(d, tab);
+            score = grid.firstAdd(d, tab);
+            updateCurrentPLayerScore(score);
             player[current].remove(tab);
             player[current].refill();
            pass();
@@ -59,11 +60,13 @@ public class Game {
      * @param index the index of the tile in the player's hand
      */
     public void play(int row, int col, int index) throws QwirkleException{
+        int score;
         try {
 
             List<Tile> maliste = getCurrentPlayerHand();
             Tile t = maliste.get(index);
-            grid.add(row, col, t);
+            score = grid.add(row, col, t);
+            updateCurrentPLayerScore(score);
             player[current].remove(t);
             player[current].refill();
             pass();
@@ -84,6 +87,7 @@ public class Game {
      * @param indexes the indices of the tiles in the player's hand
      */
     public void play(int row, int col, Direction d, int... indexes) throws QwirkleException {
+        int score;
         try {
 
             List<Tile> maliste = getCurrentPlayerHand();
@@ -93,7 +97,8 @@ public class Game {
             for (int i = 0; i < indexes.length; i++) {
                 tab[i] = maliste.get(indexes[i]);
             }
-            grid.add(row, col, d, tab);
+            score = grid.add(row, col, d, tab);
+            updateCurrentPLayerScore(score);
             player[current].remove(tab);
             player[current].refill();
             pass();
@@ -112,7 +117,7 @@ public class Game {
      *                          or if any of the positions specified are invalid or if the player tries to play an invalid move.
      */
     public void play(int... is) throws QwirkleException{//48,51,1,47,51,3
-
+        int score;
         if (is.length < 3 || is.length % 3 != 0) {
             throw new QwirkleException("arguments invalides");
         }
@@ -132,7 +137,8 @@ public class Game {
                 array[k++] = new TileAtPosition(row, col, tab[j++]);
                 i = i + 3;
             }
-            grid.add(array);
+            score = grid.add(array);
+            updateCurrentPLayerScore(score);
             player[current].remove(tab);
             player[current].refill();
 
@@ -171,6 +177,14 @@ public class Game {
         return player[current].getHand();
     }
 
+
+    public void updateCurrentPLayerScore(int score){
+        getCurrentPlayer().addPoints(score);
+    }
+
+    public int getScore(){
+        return getCurrentPlayer().getScore();
+    }
     /**
      * This method advances the turn to the next player in the game.
      */

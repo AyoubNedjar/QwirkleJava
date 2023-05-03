@@ -21,7 +21,7 @@ public class App {
         try {
             game = new Game(askName(nb));//demande de noms
             game.setCurrent(getRandomPlayer(nb));//met current a un indice random;
-            View.display(game.getCurrentPlayer().getNom(), game.getCurrentPlayerHand());
+            View.display(game.getCurrentPlayer().getNom(), game.getCurrentPlayerHand(),game.getScore());
             game.first(chooseDirection(), chooseTiles());
             view.display(game.getGrid());
 
@@ -38,7 +38,7 @@ public class App {
                 boolean ok = true;
                 while (ok) {
                     try {
-                        View.display(game.getCurrentPlayer().getNom(), game.getCurrentPlayerHand());
+                        View.display(game.getCurrentPlayer().getNom(), game.getCurrentPlayerHand(),game.getScore());
                         //affiche la main du joueur courant
                         char choice = askMethod();//demande la methode choisie en vérifiant bien les commandes entrées.
                         isGameOver = playChoice(choice, isGameOver);
@@ -145,7 +145,7 @@ public class App {
      */
     private static void executeChooice(char choice) {
         View.display(game.getGrid());
-        View.display(game.getCurrentPlayer().getNom(), game.getCurrentPlayerHand());
+        View.display(game.getCurrentPlayer().getNom(), game.getCurrentPlayerHand(),game.getScore());
 
         switch (choice) {
             case 'o' -> {//joue une seule tuile
@@ -257,7 +257,7 @@ public class App {
                         case 'f' -> {
                             System.out.println(View.ORANGE + "Les premières tuiles ont déja été jouées" + View.RESET);
                             View.display(game.getGrid());
-                            View.display(game.getCurrentPlayerName(), game.getCurrentPlayerHand());
+                            View.display(game.getCurrentPlayerName(), game.getCurrentPlayerHand(),game.getScore());
                         }
                         case 'p' -> {
                             return 'p';

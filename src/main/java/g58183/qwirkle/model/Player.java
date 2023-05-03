@@ -14,6 +14,7 @@ import java.util.Collections;
 public class Player {
     private final String nom;
     private final List<Tile> tiles;
+    private  int score;
 
     /**
 
@@ -23,6 +24,7 @@ public class Player {
     public Player(String nom) {
         this.nom = nom;
         tiles = new ArrayList<>();
+        this.score = 0;
     }
     /**
 
@@ -32,6 +34,24 @@ public class Player {
     public String getNom() {
         return nom;
     }
+
+    /**
+     Returns the score of the player.
+     @return the score of the player.
+     */
+    public int getScore() {
+        return this.score;
+    }
+
+    public void setScore(int score){
+        this.score = score;
+    }
+    public void addPoints(int points){
+        setScore(getScore()+points);
+    }
+
+
+
     /**
 
      Returns an unmodifiable list of tiles in the player's hand.

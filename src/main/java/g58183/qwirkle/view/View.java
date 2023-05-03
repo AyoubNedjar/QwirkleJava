@@ -73,6 +73,7 @@ public class View {
         }
         System.out.println();
         System.out.println("-------------------------------");
+
     }
 
     /**
@@ -132,7 +133,7 @@ public class View {
      * @param nameplayer the name of the player
      * @param playerHand the hand of the player
      */
-    public static void display(String nameplayer, List<Tile> playerHand) {
+    public static void display(String nameplayer, List<Tile> playerHand, int score) {
         System.out.println();
         System.out.println(View.GREEN+"C'est au tour du joueur "+nameplayer+View.RESET);
         System.out.print("Main { : ");
@@ -145,13 +146,15 @@ public class View {
         for (int i = 1; i < 7; i++) {
             System.out.print(i + "  ");
         }
+        out.println();
+        out.print("Votre score actuel est de : "+ score);
         System.out.println();
 
     }
 
 
     public static void displayHelp() {
-        // Définir le texte avec les lettres de commande en jaune
+
         String text = String.format(
                 "Qwirkle command: choisissez ce que vous voulez jouer :\n"
                         + " -play 1 tile : %s'o'%s\n"
@@ -181,14 +184,6 @@ public class View {
      Displays the game title on the console.
      */
     public static void displayTitle(){
-        /*System.out.println("\n\n\n");
-        System.out.println(View.BLUE + "****************************************************"
-                + "********************************************" + View.RESET);
-        System.out.println("              *              " + ORANGE + "Q"+
-                "     W     I     R     K     L     E");
-        System.out.println(View.BLUE + "****************************************************"
-                + "********************************************" + View.RESET);
-*/
         System.out.println("+--------------------------------------+");
         System.out.println("|                                      |");
         System.out.println("|      Welcome to the game of          |");
