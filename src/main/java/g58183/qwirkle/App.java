@@ -184,8 +184,8 @@ public class App {
     private static int robuste(int a, int b, String message) {
         boolean ok = true;
         int number = -1;
-        Scanner clavier = new Scanner(System.in);
-        ;
+        Scanner clavier;
+
         do {
             try {
                 if (!message.equals("")) {
@@ -241,7 +241,6 @@ public class App {
                     } else {
                         throw new QwirkleException(View.ORANGE + "Le plateau est vide , tapez " + View.YELLOW_BOLD + "'f'"
                                 + View.RESET + View.YELLOW_BOLD + " pour commencer !" + View.RESET);
-
                     }
                 } else {
                     switch (choice.charAt(0)) {

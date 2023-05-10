@@ -57,9 +57,7 @@ public class Player {
      Returns an unmodifiable list of tiles in the player's hand.
      @return an unmodifiable list of tiles in the player's hand.
      */
-    public List<Tile> getHand() {
-        return Collections.unmodifiableList(tiles);
-    }
+    public List<Tile> getHand() {return Collections.unmodifiableList(tiles);}
     /**
 
      Refills the player's hand with tiles from the bag until the player has 6 tiles in their hand.

@@ -301,7 +301,11 @@ public class Grid {
             score++;
         }
         return score;
+
+
     }
+
+
 
     /**
      * This method allows to place multiple tiles not consecutively
@@ -311,7 +315,6 @@ public class Grid {
      * @throws QwirkleException if the tiles are not on the same row or column
      */
     public int add(TileAtPosition... tile) throws QwirkleException {
-
 
         if (containsDoublonsBeforeToPlace(tile)) {
             throw new QwirkleException("Il ne peut pas avoir la même tuile sur la même ligne");
@@ -340,7 +343,6 @@ public class Grid {
      */
     private void checkTilesAfterPosed(TileAtPosition... tile) throws QwirkleException {
         List<TileAtPosition> myList = Arrays.stream(tile).toList();
-        int cpt = 1;
 
         if (!caseVides(tile)) {//if the positions are not empty
             throw new QwirkleException(View.ORANGE + "Il y'a déjà des tuiles à cette position " + View.RESET);
@@ -352,7 +354,7 @@ public class Grid {
         List<Boolean> isValid = new ArrayList<>();
 
         for (TileAtPosition t : tile) {
-//this is just recording a boolean value which informs us if a tile has neighbors
+        //this is just recording a boolean value which informs us if a tile has neighbors
             isValid.add(hasValidNeighbor(t.row(), t.col(), t.tile()));
         }
 
@@ -460,6 +462,32 @@ public class Grid {
 
 }
 
+
+
+/*List<Boolean> isValid = new ArrayList<>();
+
+            for (int i = 0; i < line.length; i++) {
+
+                isValid.add(hasValidNeighbor(lg, cln, line[i]));
+                lg += deltaRow;
+                cln += deltaColumn;
+                score++;
+            }
+
+
+private boolean containsDoublonsBeforeToPlaceTile(Tile... tile) {
+        List<Tile> myList = new ArrayList<>();
+
+        for (Tile t : tile) {
+            if (myList.contains(t)) {
+                return true;
+            } else {
+                myList.add(t);
+            }
+        }
+        return false;
+    }
+ */
 
 
 
