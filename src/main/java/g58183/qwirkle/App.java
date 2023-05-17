@@ -13,6 +13,7 @@ public class App {
 
     public static void main(String[] args) {
 
+
         int nb = 0;
         View.displayTitle();
         System.out.println("Combien de joueurs vont jouer ? : ");
@@ -50,7 +51,6 @@ public class App {
                         view.displayError(View.RED + "Coup invalide rééssayer!" + View.RESET);
 
                     }
-
 
                 }
 

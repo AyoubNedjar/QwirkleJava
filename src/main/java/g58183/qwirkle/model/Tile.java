@@ -1,5 +1,6 @@
 package g58183.qwirkle.model;
 
+
 import java.util.Objects;
 
 /**

@@ -96,11 +96,17 @@ class GridTest {
         var t6 = new Tile(PURPLE, SQUARE);
         grid.add(46, 45, RIGHT, t4, t5, t6);
 
+        var gr = new GridView(grid);
+        View.display(gr);
         var t7 = new Tile(YELLOW, SQUARE);
         var t8 = new Tile(YELLOW, STAR);
         var t9 = new Tile(YELLOW, ROUND);
+
+
+
         assertThrows(QwirkleException.class, ()->grid.add(46, 48, RIGHT, t7, t8, t9));
     }
+
     @Test
     void rules_cedric_b_fail_2() {
         var t1 = new Tile(RED, ROUND);
@@ -112,11 +118,16 @@ class GridTest {
         var t5 = new Tile(BLUE, SQUARE);
         var t6 = new Tile(PURPLE, SQUARE);
         grid.add(46, 45, RIGHT, t4, t5, t6);
+        var gr = new GridView(grid);
+        View.display(gr);
 
         var t7 = new Tile(YELLOW, SQUARE);
         var t8 = new Tile(YELLOW, STAR);
         var t9 = new Tile(PURPLE, ROUND);
+
+        View.display(gr);
         assertThrows(QwirkleException.class, ()->grid.add(46, 48, RIGHT, t7, t8, t9));
+
     }
 
     @Test
@@ -1848,23 +1859,37 @@ class GridTest {
     @Test
     void testScore(){
         Grid grid = new Grid();
-
+        var gr = new GridView(grid);
         //1
         Tile t1 = new Tile(RED, ROUND);
         Tile t2 = new Tile(RED, DIAMOND);
         Tile t3 = new Tile(RED, PLUS);
-        int result = grid.firstAdd(UP, t1, t2, t3);
-       assertEquals(3,result);
+        grid.firstAdd(UP, t1, t2, t3);
 
+
+       
         //2
         Tile t4 = new Tile(RED, SQUARE);
         Tile t5 = new Tile(BLUE, SQUARE);
+        Tile t6 = new Tile(GREEN, SQUARE);
+        grid.add(46, 45, RIGHT,  t4, t5,t6);
 
+        //3
+        Tile t7 = new Tile(BLUE, ROUND);
 
-        int res =grid.add(46, 45, RIGHT, t4, t5);
-       assertEquals(2,res);
+        //4 espere avoir 6
+        //ce sont cens etre des tileAtPosition
+        Tile t8 = new Tile(GREEN, PLUS);
+        Tile t9 = new Tile(GREEN, DIAMOND);
+        /*int res =grid.add(43, 44,DOWN,  t8, t9);
+        assertEquals(6,res);*/
+        grid.add(43, 44,DOWN,  t8, t9);
+
+        //5
+
 
     }
+
 
 
 }

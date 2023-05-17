@@ -2,11 +2,18 @@ package g58183.qwirkle.model;
 
 import g58183.qwirkle.view.View;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
-public class Game {
+public class Game implements Serializable {
     private final Grid grid;
     private final Player[] player;
+
+
     private int current;
 
     public Game(List<String> noms) {
@@ -14,10 +21,97 @@ public class Game {
         for (int i = 0; i < noms.size(); i++) {
             player[i] = new Player(noms.get(i));
             player[i].refill();
+
         }
 
         grid = new Grid();
         current = 0;
+    }
+
+
+
+    public boolean isOver(){
+        return !canAllPlay() && Bag.getInstance().size()==0;
+    }
+    private boolean canAllPlay(){
+        //si un des jouerus peut jouer alors le jeu n'est pas fini
+        for (Player p : getPlayers()) {
+            if(canPlay(p)){
+                return true;
+            }
+
+        }
+        return false;
+    }
+
+    /**
+     * Pour chaque joueur on va prendre les tuile qui se trouve dans sa main
+     * regarder les tuiles déja jouées sur le plateau
+     * placer chaque tuile de la main du joueur à chaque adjacence de toutes les tuiles présente sur le plateau
+     * @param player
+     * @return
+     */
+    private boolean canPlay(Player player){
+
+        for (Tile t: player.getHand()) {
+
+                for (TileAtPosition tap: grid.getPlayedList()) {
+                    //adjacence de chaque tuile tap
+                    int rowUp = tap.row()+1;
+                    int rowDown = tap.row()-1;
+                    int colLeft = tap.col()-1;
+                    int colRight = tap.col()+1;
+
+
+                    //on passe dans toutes les adjacences des pieces déja jouées
+                    //si on voit que il y a au moins une tuile de la main qui peut etre jouée donc qui doit renvoyer true
+                    //alors c'est que le joueur peut encore jouer
+                    if(checkPossibleMove(tap.row(), colRight, t) //retourne vrai si
+                        ||checkPossibleMove(tap.row(), colLeft, t)
+                        ||checkPossibleMove(rowUp, tap.col(), t)
+                        || checkPossibleMove(rowDown, tap.col(), t)){
+                        return true;
+                    }
+                }
+        }
+        return false;
+    }
+
+
+    /**
+     *
+     * la methode met la tuile sur la plateau , si ca lance une erreur la tuile n'est pas ajouter grace a la methode add mais
+     * mais si la methode ne renvoi pas d'erreur c'est que une tuile a pu etre ajouté donc une tuile est encore bonne
+     * puis on supprime la tuile placée
+     * @param row
+     * @param col
+     * @param t
+     * @return
+     */
+    private boolean checkPossibleMove(int row, int col, Tile t){
+        try{
+            grid.add(row, col, t);
+            grid.remove(row, col);
+            return true;
+        }catch(QwirkleException e){
+            return false;
+        }
+
+    }
+
+
+
+
+    public void saveGameData() {
+        try {
+            FileOutputStream fos = new FileOutputStream("mydata.ser");
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            oos.writeObject(this);
+            oos.close();
+            System.out.println("Game data saved.");
+        } catch (IOException e) {
+            System.out.println("Error saving game data: " + e.getMessage());
+        }
     }
 
     /**
@@ -202,13 +296,7 @@ public class Game {
         return player;
     }
 
-    /**
-     Checks if the game is over.
-     @return true if the game is over, false otherwise.
-     */
-    public boolean isGameOver() {
-        return true;
-    }
+
 
     /**
      * This method returns the current player.
