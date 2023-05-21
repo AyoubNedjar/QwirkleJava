@@ -2,17 +2,20 @@ package g58183.qwirkle.model;
 
 import g58183.qwirkle.view.View;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
-import java.util.ArrayList;
+import java.io.*;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Scanner;
 
 public class Game implements Serializable {
     private final Grid grid;
     private final Player[] player;
 
+    public static final Path SAVE_DIRECTORY = Path.of("saves");
 
     private int current;
 
@@ -27,6 +30,125 @@ public class Game implements Serializable {
         grid = new Grid();
         current = 0;
     }
+
+
+    /**
+     * pour sauvegarder une partie
+     * @param directoryPath
+     * @param numFichier
+     */
+    public void saveGameData(String directoryPath, int numFichier ) {
+        String fileName = "game_" + numFichier + ".ser";
+
+        try {
+            File directory = new File(directoryPath);
+            if (!directory.exists()) {
+                directory.mkdirs();
+            }
+
+            FileOutputStream fos = new FileOutputStream(directoryPath + File.separator + fileName);
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            oos.writeObject(this);
+            oos.close();
+            System.out.println("Les données de cette parties sont sauvegardées au : "
+                    + directoryPath + File.separator + fileName);
+        } catch (IOException e) {
+            System.out.println("Erreur lors de la sauvergarde de la partie: " + e.getMessage());
+        }
+    }
+
+    public void write(String pathName) {
+        if (!pathName.endsWith(".save"))
+            pathName = pathName + ".save";
+
+        try {
+            if (Files.notExists(SAVE_DIRECTORY))
+                Files.createDirectory(SAVE_DIRECTORY);
+
+            Path path = SAVE_DIRECTORY.resolve(pathName);
+
+            if (Files.exists(path))
+                Files.delete(path);
+
+            Files.createFile(path);
+
+            try (final var outputStream = Files.newOutputStream(path, StandardOpenOption.WRITE);
+                 final ObjectOutputStream classOut = new ObjectOutputStream(outputStream)) {
+                classOut.writeObject(this);
+                classOut.flush();
+            }
+        } catch (Exception e) {
+            throw new QwirkleException("Erreur lors de l'écriture du fichier");
+        }
+    }
+
+    public static Game getFromFile(String pathName) {
+        if(!pathName.endsWith(".save"))
+            pathName = pathName + ".save";
+
+        try {
+            if(Files.notExists(SAVE_DIRECTORY))
+                Files.createDirectory(SAVE_DIRECTORY);
+
+            Path path = SAVE_DIRECTORY.resolve(pathName);
+
+            if(Files.notExists(path))
+                throw new QwirkleException("La sauvegarde " + pathName + " n'existe pas");
+
+            try(final var inputStream = Files.newInputStream(path);
+                final ObjectInputStream classIn = new ObjectInputStream(inputStream)) {
+
+                return (Game) classIn.readObject();
+            }
+        }
+        catch (Exception e) {
+            throw new QwirkleException("Erreur lors de la lecture du fichier");
+        }
+    }
+
+    public static boolean hasSaves() {
+        if(!Files.exists(SAVE_DIRECTORY))
+            return false;
+
+        return listSaves().size() > 0;
+    }
+
+    public static List<String> listSaves() {
+        if(!Files.exists(SAVE_DIRECTORY))
+            return List.of();
+
+        try (var stream = Files.list(SAVE_DIRECTORY)) {
+            return stream.filter(path -> path.getFileName().toString().endsWith(".save")).map(path -> {
+                String fileName = path.getFileName().toString();
+                return fileName.substring(0, fileName.length() - 5);
+            }).toList();
+        } catch (Exception e) {
+            throw new QwirkleException("Erreur lors de la lecture du dossier");
+        }
+    }
+
+
+    /**
+     * Pour génénérer récupéer les détails d'une partie passée en paramètre
+     * @param saveFile
+     */
+    public static void loadGameData(File saveFile) {
+        try {
+            FileInputStream fis = new FileInputStream(saveFile);
+            ObjectInputStream ois = new ObjectInputStream(fis);
+            Game game = (Game) ois.readObject();
+            ois.close();
+
+            // Traiter les données de la partie chargée selon les besoins
+            System.out.println("Détails de la partie :");
+            System.out.println("Grid: " + game.getGrid());
+            System.out.println("Players: " + Arrays.toString(game.getPlayers()));
+            // Autres traitements...
+        } catch (Exception e) {
+            System.out.println("Erreur lors du chargement des données de la partie : " + e.getMessage());
+        }
+    }
+
 
 
 
@@ -96,23 +218,9 @@ public class Game implements Serializable {
         }catch(QwirkleException e){
             return false;
         }
-
     }
 
 
-
-
-    public void saveGameData() {
-        try {
-            FileOutputStream fos = new FileOutputStream("mydata.ser");
-            ObjectOutputStream oos = new ObjectOutputStream(fos);
-            oos.writeObject(this);
-            oos.close();
-            System.out.println("Game data saved.");
-        } catch (IOException e) {
-            System.out.println("Error saving game data: " + e.getMessage());
-        }
-    }
 
     /**
      * Retrieves the tiles that the player wants to place on the board from their hand and places them on the grid in the
@@ -131,6 +239,7 @@ public class Game implements Serializable {
         for (int i = 0; i < is.length; i++) {
             tab[i] = maliste.get(is[i]);//is[i] donne l'indice des tuiles
         }
+
         try {
             score = grid.firstAdd(d, tab);
             updateCurrentPLayerScore(score);
@@ -156,7 +265,6 @@ public class Game implements Serializable {
     public void play(int row, int col, int index) throws QwirkleException{
         int score;
         try {
-
             List<Tile> maliste = getCurrentPlayerHand();
             Tile t = maliste.get(index);
             score = grid.add(row, col, t);
@@ -166,9 +274,7 @@ public class Game implements Serializable {
             pass();
         } catch (QwirkleException e) {
             System.out.println(View.RED+e.getMessage()+View.RESET);
-
         }
-
     }
 
     /**
@@ -183,10 +289,8 @@ public class Game implements Serializable {
     public void play(int row, int col, Direction d, int... indexes) throws QwirkleException {
         int score;
         try {
-
             List<Tile> maliste = getCurrentPlayerHand();
             Tile[] tab = new Tile[indexes.length];
-
 
             for (int i = 0; i < indexes.length; i++) {
                 tab[i] = maliste.get(indexes[i]);
@@ -200,6 +304,7 @@ public class Game implements Serializable {
             System.out.println(View.RED+e.getMessage()+View.RESET);
         }
     }
+
 
     /**
      * Plays the tiles in the current player's hand at the specified positions on the game board.
@@ -223,6 +328,7 @@ public class Game implements Serializable {
             int k = 0;
             Tile[] tab = new Tile[is.length / 3];
             TileAtPosition[] array = new TileAtPosition[is.length / 3];
+
             //45,45,3,50,55,4
             while (i < is.length) {//s'appliquera juste pour les lignes de chaque tuiles
                 int row = is[i];
@@ -235,13 +341,10 @@ public class Game implements Serializable {
             updateCurrentPLayerScore(score);
             player[current].remove(tab);
             player[current].refill();
-
             pass();
         } catch (QwirkleException e) {
             System.out.println(View.RED+e.getMessage()+View.RESET);
         }
-
-
     }
 
     /**

@@ -1,12 +1,13 @@
 package g58183.qwirkle.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Bag represent the bag of tiles
  */
-public class Bag {
+public class Bag implements Serializable {
 
     private static Bag instance = null;
     private List<Tile> tiles;

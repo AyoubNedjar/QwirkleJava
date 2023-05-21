@@ -2,9 +2,11 @@ package g58183.qwirkle.model;
 
 import g58183.qwirkle.view.View;
 
+import java.io.Serializable;
 import java.util.*;
+import java.util.stream.Collectors;
 
-public class Grid {
+public class Grid implements Serializable {
     private final Tile[][] tiles;
     
     private List<TileAtPosition> listPlayedTile;
@@ -173,7 +175,7 @@ public class Grid {
      */
     private boolean isValidColorOrShape(Tile t1, Tile t2, Tile t3) {
 
-        if (t2 == null || t1==null) {
+        if (t1 == null || t2==null) {
             return true;
         }
         if (t3 == null) {
@@ -382,7 +384,7 @@ public class Grid {
         try {
             if (sameRowOrCol(tile)) {
                 checkTilesBeforePosed(tile);
-                return scoreFinal(tile);
+                return scoreFinalByTileAtPosition(tile);
             } else {
                 throw new QwirkleException(View.ORANGE + "Pas la même ligne ou colonne" + View.RESET);
             }
@@ -542,14 +544,14 @@ public class Grid {
     return score;
     }
 
-    private int scoreFinal(TileAtPosition... line){
+    private int scoreFinalByTileAtPosition(TileAtPosition... line){
         List<TileAtPosition> myListe = new ArrayList<>();
         for (int i = 0; i < line.length; i++) {
             myListe.addAll(calculScoreOptimal(line[i].row(), line[i].col(),Direction.UP));
             myListe.addAll(calculScoreOptimal(line[i].row(), line[i].col(),Direction.RIGHT));
         }
 
-        return removeDuplicates(myListe)+1;
+        return removeDuplicates(myListe)+line.length;
     }
     private int scoreFinalByDirection( Direction d,TileAtPosition... line){
         int score = 0;
@@ -569,7 +571,7 @@ public class Grid {
 
             for (int i = 0; i < line.length; i++) {
                 if(!calculScoreOptimal(line[i].row(), line[i].col(),Direction.RIGHT).isEmpty()){
-                    score = score+ calculScoreOptimal(line[i].row(), line[i].col(),Direction.RIGHT).size();
+                    score = score+ calculScoreOptimal(line[i].row(), line[i].col(),Direction.RIGHT).size()+1;
                 }
 
             }
@@ -583,15 +585,19 @@ public class Grid {
      * @return a new list of TileAtPos objects without duplicates
      */
     public int removeDuplicates(List<TileAtPosition> tileList) {
-        Set<TileAtPosition> uniqueTiles = new HashSet<>();
+        /*Set<TileAtPosition> uniqueTiles = new HashSet<>();
         List<TileAtPosition> result = new ArrayList<>();
         for (TileAtPosition tile : tileList) {
             if (uniqueTiles.add(tile)) {
                 result.add(tile);
             }
         }
-        return result.size();
+        return result.size();*/
+
+        return tileList.stream().collect(Collectors.toSet()).size();
+
     }
+
     private List<TileAtPosition> calculScoreOptimal(int row, int col, Direction d){
         List<TileAtPosition> myListe = new ArrayList<>();
 

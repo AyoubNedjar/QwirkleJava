@@ -156,19 +156,22 @@ public class View {
     public static void displayHelp() {
 
         String text = String.format(
-                "Qwirkle command: choisissez ce que vous voulez jouer :\n"
-                        + " -play 1 tile : %s'o'%s\n"
-                        + " -play line: %sl%s\n"
-                        + " -play plic-ploc : %sm%s\n"
-                        + " -play first : %sf%s\n"
-                        + " -pass : %sp%s\n"
-                        + " -quit : %sq%s\n"
-                        + "Entrez votre choix :\n",
+                View.BLUE+"Qwirkle command: choisissez ce que vous voulez jouer"+View.RESET+" :\n"
+                        + " -play 1 tile : "+View.YELLOW+"o <row> <col> <i>"+View.RESET+"\n"
+                        + " -play line: "+View.YELLOW+"l <row> <col> <direction> <i1> [<i2>]"+View.RESET+"\n"
+                        + " -play plic-ploc : "+View.YELLOW+" m <row1> <col1> <i1> [<row2> <col2> <i2>]"+View.RESET+"\n"
+                        + " -play first : "+View.YELLOW+"f <direction> <i1> [<i2>]"+View.RESET+"\n"
+                        + " -pass : "+View.YELLOW+"p\n"+View.RESET+""
+                        + " -quit: "+View.YELLOW+"q"+View.RESET+"\n"
+                        + " -save : : "+View.YELLOW+"s"+View.RESET+"\n"
+                        + "  PS ->    i : index in list of tiles\n"
+                        + "     ->    d : direction in l (left), r (right), u (up), d(down)\n"
+                        + ""+View.YELLOW+"Entrez votre choix :"+View.RESET+" : ",
                 YELLOW_BOLD, RESET, YELLOW_BOLD, RESET, YELLOW_BOLD, RESET,
                 YELLOW_BOLD, RESET, YELLOW_BOLD, RESET, YELLOW_BOLD, RESET
         );
 
-        out.println(text);
+        out.print(text);
     }
 
     /**
@@ -198,5 +201,16 @@ public class View {
         System.out.println();
 
     }
+
+    /* String text = String.format(
+                "Qwirkle command: choisissez ce que vous voulez jouer :\n"
+                        + " -play 1 tile : %so o <row> <col> <i>%s\n"
+                        + " -play line: %sl <row> <col> <direction> <i1> [<i2>]%s\n"
+                        + " -play plic-ploc : %s m <row1> <col1> <i1> [<row2> <col2> <i2>]%s\n"
+                        + " -play first : %sf <direction> <i1> [<i2>]%s\n"
+                        + " -pass : %sp%s\n"
+                        + " -quit : %sq%s\n"
+                        + " -saveGame : %ss%s\n"
+                        + "Entrez votre choix :\n",*/
 
 }

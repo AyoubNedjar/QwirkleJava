@@ -1866,12 +1866,42 @@ class GridTest {
         Tile t3 = new Tile(RED, PLUS);
         grid.firstAdd(UP, t1, t2, t3);
 
-
-       
         //2
         Tile t4 = new Tile(RED, SQUARE);
         Tile t5 = new Tile(BLUE, SQUARE);
         Tile t6 = new Tile(GREEN, SQUARE);
+         grid.add(46, 45, RIGHT,  t4, t5,t6);
+
+        //3
+        Tile t7 = new Tile(BLUE, ROUND);
+
+        //4 espere avoir 6
+        //ce sont cens etre des tileAtPosition
+        Tile t8 = new Tile(GREEN, PLUS);
+        Tile t9 = new Tile(GREEN, DIAMOND);
+       grid.add(43, 44,DOWN,  t8, t9);
+
+        //grid.add(43, 44,DOWN,  t8, t9);
+
+        Tile t10 = new Tile(GREEN, STAR);
+        Tile t11 = new Tile(GREEN, ROUND);
+        int res3 =grid.add(new TileAtPosition(45, 44, t11),  new TileAtPosition(45, 44, t10));
+        assertEquals(7, res3);
+        //5
+
+
+    }
+    @Test
+    void E(){
+        Tile t1 = new Tile(RED, ROUND);
+        Tile t2 = new Tile(RED, DIAMOND);
+        Tile t3 = new Tile(RED, PLUS);
+        grid.firstAdd(UP, t1, t2, t3);
+
+        //2
+        Tile t4 = new Tile(RED, SQUARE);
+        Tile t5 = new Tile(BLUE, SQUARE);
+        Tile t6 = new Tile(YELLOW, SQUARE);
         grid.add(46, 45, RIGHT,  t4, t5,t6);
 
         //3
@@ -1881,13 +1911,15 @@ class GridTest {
         //ce sont cens etre des tileAtPosition
         Tile t8 = new Tile(GREEN, PLUS);
         Tile t9 = new Tile(GREEN, DIAMOND);
-        /*int res =grid.add(43, 44,DOWN,  t8, t9);
-        assertEquals(6,res);*/
         grid.add(43, 44,DOWN,  t8, t9);
 
+        Tile t10 = new Tile(GREEN, STAR);
+        Tile t11 = new Tile(GREEN, ROUND);
+        Tile t12 = new Tile(GREEN, SQUARE);
+        int res3 =grid.add(new TileAtPosition(45, 44, t11),  new TileAtPosition(42, 44, t10),
+                new TileAtPosition(46, 44, t12));
+        //assertEquals(12, res3);
         //5
-
-
     }
 
 

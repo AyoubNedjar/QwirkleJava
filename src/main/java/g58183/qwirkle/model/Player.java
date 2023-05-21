@@ -1,5 +1,6 @@
 package g58183.qwirkle.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -11,7 +12,7 @@ import java.util.Collections;
 
  Each player has a name and a list of tiles in their hand.
  */
-public class Player {
+public class Player implements Serializable {
     private final String nom;
     private final List<Tile> tiles;
     private  int score;
