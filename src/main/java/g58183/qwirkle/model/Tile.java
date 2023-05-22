@@ -1,12 +1,13 @@
 package g58183.qwirkle.model;
 
 
+import java.io.Serializable;
 import java.util.Objects;
 
 /**
  *
  */
-public final class Tile {
+public final class Tile implements Serializable {
     private final Color color;
     private final Shape shape;
 

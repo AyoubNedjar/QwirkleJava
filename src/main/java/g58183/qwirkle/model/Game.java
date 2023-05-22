@@ -15,7 +15,7 @@ public class Game implements Serializable {
     private final Grid grid;
     private final Player[] player;
 
-    public static final Path SAVE_DIRECTORY = Path.of("saves");
+    public static final Path SAVE_DIRECTORY = Path.of("games");
 
     private int current;
 
@@ -32,32 +32,16 @@ public class Game implements Serializable {
     }
 
 
+
     /**
-     * pour sauvegarder une partie
-     * @param directoryPath
-     * @param numFichier
+     * Writes the game state and bag of tiles to a file with the specified path name.
+     * If the path name does not end with ".save", it is appended to the file name.
+     * If the file already exists, it is deleted before creating a new file.
+     *
+     * @param pathName the path name of the file to write the game state to
+     * @throws QwirkleException if an error occurs during the file writing process
      */
-    public void saveGameData(String directoryPath, int numFichier ) {
-        String fileName = "game_" + numFichier + ".ser";
-
-        try {
-            File directory = new File(directoryPath);
-            if (!directory.exists()) {
-                directory.mkdirs();
-            }
-
-            FileOutputStream fos = new FileOutputStream(directoryPath + File.separator + fileName);
-            ObjectOutputStream oos = new ObjectOutputStream(fos);
-            oos.writeObject(this);
-            oos.close();
-            System.out.println("Les données de cette parties sont sauvegardées au : "
-                    + directoryPath + File.separator + fileName);
-        } catch (IOException e) {
-            System.out.println("Erreur lors de la sauvergarde de la partie: " + e.getMessage());
-        }
-    }
-
-    public void write(String pathName) {
+    public void write(String pathName) throws QwirkleException {
         if (!pathName.endsWith(".save"))
             pathName = pathName + ".save";
 
@@ -75,46 +59,70 @@ public class Game implements Serializable {
             try (final var outputStream = Files.newOutputStream(path, StandardOpenOption.WRITE);
                  final ObjectOutputStream classOut = new ObjectOutputStream(outputStream)) {
                 classOut.writeObject(this);
+                classOut.writeObject(Bag.getInstance());
                 classOut.flush();
             }
         } catch (Exception e) {
-            throw new QwirkleException("Erreur lors de l'écriture du fichier");
+            throw new QwirkleException("Error while writing the file");
         }
     }
 
-    public static Game getFromFile(String pathName) {
-        if(!pathName.endsWith(".save"))
+    /**
+     * Reads the game state and bag of tiles from a file with the specified path name
+     * and returns a Game object with the loaded state.
+     * If the path name does not end with ".save", it is appended to the file name.
+     *
+     * @param pathName the path name of the file to read the game state from
+     * @return the Game object with the loaded state
+     * @throws QwirkleException if the file does not exist or an error occurs during the file reading process
+     */
+    public static Game getFromFile(String pathName) throws QwirkleException {
+        if (!pathName.endsWith(".save"))
             pathName = pathName + ".save";
 
         try {
-            if(Files.notExists(SAVE_DIRECTORY))
+            if (Files.notExists(SAVE_DIRECTORY))
                 Files.createDirectory(SAVE_DIRECTORY);
 
             Path path = SAVE_DIRECTORY.resolve(pathName);
 
-            if(Files.notExists(path))
-                throw new QwirkleException("La sauvegarde " + pathName + " n'existe pas");
+            if (Files.notExists(path))
+                throw new QwirkleException("The save " + pathName + " does not exist");
 
-            try(final var inputStream = Files.newInputStream(path);
-                final ObjectInputStream classIn = new ObjectInputStream(inputStream)) {
+            try (final var inputStream = Files.newInputStream(path);
+                 final ObjectInputStream classIn = new ObjectInputStream(inputStream)) {
+                final Game game = (Game) classIn.readObject();
+                final Bag bag = (Bag) classIn.readObject();
 
-                return (Game) classIn.readObject();
+                Bag.getInstance().getTiles().clear();
+                Bag.getInstance().getTiles().addAll(bag.getTiles());
+                return game;
             }
-        }
-        catch (Exception e) {
-            throw new QwirkleException("Erreur lors de la lecture du fichier");
+        } catch (Exception e) {
+            throw new QwirkleException("Error while reading the file");
         }
     }
 
+    /**
+     * Checks if there are any saved game files.
+     *
+     * @return true if there are saved game files, false otherwise
+     */
     public static boolean hasSaves() {
-        if(!Files.exists(SAVE_DIRECTORY))
+        if (!Files.exists(SAVE_DIRECTORY))
             return false;
 
         return listSaves().size() > 0;
     }
 
-    public static List<String> listSaves() {
-        if(!Files.exists(SAVE_DIRECTORY))
+    /**
+     * Returns a list of the names of all saved game files.
+     *
+     * @return a list of saved game file names
+     * @throws QwirkleException if an error occurs during the folder reading process
+     */
+    public static List<String> listSaves() throws QwirkleException {
+        if (!Files.exists(SAVE_DIRECTORY))
             return List.of();
 
         try (var stream = Files.list(SAVE_DIRECTORY)) {
@@ -123,45 +131,29 @@ public class Game implements Serializable {
                 return fileName.substring(0, fileName.length() - 5);
             }).toList();
         } catch (Exception e) {
-            throw new QwirkleException("Erreur lors de la lecture du dossier");
+            throw new QwirkleException("Error while reading the folder");
         }
     }
-
 
     /**
-     * Pour génénérer récupéer les détails d'une partie passée en paramètre
-     * @param saveFile
+     * Checks if the game is over by determining if all players cannot play any more tiles and the bag is empty.
+     *
+     * @return true if the game is over, false otherwise
      */
-    public static void loadGameData(File saveFile) {
-        try {
-            FileInputStream fis = new FileInputStream(saveFile);
-            ObjectInputStream ois = new ObjectInputStream(fis);
-            Game game = (Game) ois.readObject();
-            ois.close();
-
-            // Traiter les données de la partie chargée selon les besoins
-            System.out.println("Détails de la partie :");
-            System.out.println("Grid: " + game.getGrid());
-            System.out.println("Players: " + Arrays.toString(game.getPlayers()));
-            // Autres traitements...
-        } catch (Exception e) {
-            System.out.println("Erreur lors du chargement des données de la partie : " + e.getMessage());
-        }
+    public boolean isOver() {
+        return !canAllPlay() && Bag.getInstance().size() == 0;
     }
 
-
-
-
-    public boolean isOver(){
-        return !canAllPlay() && Bag.getInstance().size()==0;
-    }
-    private boolean canAllPlay(){
-        //si un des jouerus peut jouer alors le jeu n'est pas fini
+    /**
+     * Checks if any of the players can play a tile.
+     *
+     * @return true if at least one player can play a tile, false otherwise
+     */
+    private boolean canAllPlay() {
         for (Player p : getPlayers()) {
-            if(canPlay(p)){
+            if (canPlay(p)) {
                 return true;
             }
-
         }
         return false;
     }
@@ -240,14 +232,22 @@ public class Game implements Serializable {
             tab[i] = maliste.get(is[i]);//is[i] donne l'indice des tuiles
         }
 
+        boolean ispass = true;
         try {
             score = grid.firstAdd(d, tab);
-            updateCurrentPLayerScore(score);
+            updateCurrentPlayerScore(score);
             player[current].remove(tab);
             player[current].refill();
-           pass();
+
+
         } catch (QwirkleException e) {
-            System.out.println(View.RED+e.getMessage()+View.RESET);
+            System.out.println(Color.RED+e.getMessage()+View.RESET);
+            ispass = false;
+        }finally {
+            if(ispass){
+                pass();
+            }
+
         }
 
 
@@ -264,16 +264,23 @@ public class Game implements Serializable {
      */
     public void play(int row, int col, int index) throws QwirkleException{
         int score;
+        boolean ispass = true;
         try {
             List<Tile> maliste = getCurrentPlayerHand();
             Tile t = maliste.get(index);
             score = grid.add(row, col, t);
-            updateCurrentPLayerScore(score);
+            updateCurrentPlayerScore(score);
             player[current].remove(t);
             player[current].refill();
-            pass();
+
         } catch (QwirkleException e) {
-            System.out.println(View.RED+e.getMessage()+View.RESET);
+            System.out.println(Color.RED+e.getMessage()+View.RESET);
+            ispass = false;
+        }finally {
+            if(ispass){
+                pass();
+            }
+
         }
     }
 
@@ -288,6 +295,7 @@ public class Game implements Serializable {
      */
     public void play(int row, int col, Direction d, int... indexes) throws QwirkleException {
         int score;
+        boolean ispass = true;
         try {
             List<Tile> maliste = getCurrentPlayerHand();
             Tile[] tab = new Tile[indexes.length];
@@ -296,12 +304,19 @@ public class Game implements Serializable {
                 tab[i] = maliste.get(indexes[i]);
             }
             score = grid.add(row, col, d, tab);
-            updateCurrentPLayerScore(score);
+            updateCurrentPlayerScore(score);
             player[current].remove(tab);
             player[current].refill();
-            pass();
+
+
         } catch (QwirkleException e) {
-            System.out.println(View.RED+e.getMessage()+View.RESET);
+            System.out.println(Color.RED+e.getMessage()+View.RESET);
+            ispass = false;
+        }finally {
+            if(ispass){
+                pass();
+            }
+
         }
     }
 
@@ -321,6 +336,7 @@ public class Game implements Serializable {
             throw new QwirkleException("arguments invalides");
         }
 
+        boolean ispass = true;
         try {
             List<Tile> maliste = getCurrentPlayerHand();
             int j = 0;
@@ -337,15 +353,31 @@ public class Game implements Serializable {
                 array[k++] = new TileAtPosition(row, col, tab[j++]);
                 i = i + 3;
             }
+
             score = grid.add(array);
-            updateCurrentPLayerScore(score);
+            updateCurrentPlayerScore(score);
+
             player[current].remove(tab);
             player[current].refill();
-            pass();
+
         } catch (QwirkleException e) {
-            System.out.println(View.RED+e.getMessage()+View.RESET);
+            System.out.println(Color.RED+e.getMessage()+View.RESET);
+            ispass = false;
+        }finally {
+            if(ispass){
+                pass();
+            }
+
         }
     }
+
+
+    /**
+     * Checks if a player can make a move.
+     *
+     * @param player The player to check.
+     * @return {@code true} if the player can make a move, {@code false} otherwise.
+     */
 
     /**
      * This method returns a new instance of the GridView class that displays the current state of the game grid.
@@ -374,11 +406,14 @@ public class Game implements Serializable {
         return player[current].getHand();
     }
 
-
-    public void updateCurrentPLayerScore(int score){
+    /**
+     * Updates the score of the current player by adding the specified score.
+     *
+     * @param score the score to be added to the current player's score
+     */
+    public void updateCurrentPlayerScore(int score) {
         getCurrentPlayer().addPoints(score);
     }
-
     public int getScore(){
         return getCurrentPlayer().getScore();
     }
@@ -428,5 +463,44 @@ public class Game implements Serializable {
         this.current = current;
     }
 
+    /*public boolean isOver() {
+        // Check if the game has already been declared over
+        if (over) {
+            // If the game has already been declared over, return true
+            return true;
+        }
+
+        // Iterate over all players in the game
+        for (Player player : players) {
+            // Check if the player can make a move on the board or if the tile bag contains tiles that can be played
+            if (!canPlay(player) && Bag.getInstance().size() == 0) {
+                // If no player can make a move and the tile bag is empty, the game is over
+                return true;
+            }
+        }
+
+        // The game is not over
+        return false;
+    }
+     public boolean canPlay(Player player) {
+        // Check if the board is empty (first move)
+        if (grid.isEmpty()) {
+            // If the board is empty, the player can make a move
+            return true;
+        }
+
+        // Iterate over all tiles in the player's hand
+        for (Tile tile : player.getHand()) {
+            // Check if the tile can be placed somewhere on the board
+            if (grid.canFitSomewhere(tile)) {
+                // If the tile can be placed on the board, the player can make a move
+                return true;
+            }
+        }
+
+        // If none of the tiles in the player's hand can be placed on the board, the player cannot make a move
+        return false;
+    }
+     */
 
 }

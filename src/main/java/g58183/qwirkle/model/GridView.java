@@ -1,6 +1,8 @@
 package g58183.qwirkle.model;
 
-public class GridView {
+import java.io.Serializable;
+
+public class GridView implements Serializable {
 
     private Grid grid;
     public GridView(Grid grid) {

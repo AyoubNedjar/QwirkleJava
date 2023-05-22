@@ -44,11 +44,22 @@ public class Player implements Serializable {
         return this.score;
     }
 
-    public void setScore(int score){
+    /**
+     * Sets the score of the player.
+     *
+     * @param score the new score to be set
+     */
+    public void setScore(int score) {
         this.score = score;
     }
-    public void addPoints(int points){
-        setScore(getScore()+points);
+
+    /**
+     * Adds the specified number of points to the player's score.
+     *
+     * @param points the number of points to be added
+     */
+    public void addPoints(int points) {
+        setScore(getScore() + points);
     }
 
 
@@ -81,6 +92,10 @@ public class Player implements Serializable {
      @param tile the tiles to be removed from the player's hand.
      */
     public void remove(Tile... tile) {
-        tiles.removeAll(Arrays.stream(tile).toList());
+
+        for (Tile t: tile) {
+            tiles.remove(t);
+        }
+
     }
 }

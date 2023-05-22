@@ -55,14 +55,22 @@ public class Bag implements Serializable {
     public Tile[] getRandomTiles(int n) {
         int nbtuiles = tiles.size();
 
+        Tile[] tab = new Tile[n];
         if (nbtuiles == 0) {
             return null;
         }
 
         //si le nombre de tuiles restantes est inferieur à n
         if (nbtuiles <= n) {
-            return (Tile[]) tiles.toArray();// cela va convertir la liste en un tableau vu que les restantes on les prend quand meme
-//
+            for (int i = 0; i < tiles.size(); i++) {
+                tab[i] = tiles.get(i);
+
+            }
+            tiles = new ArrayList<>();
+            return tab;
+            // (Tile[]) tiles.toArray();// cela va convertir la liste en un tableau vu que les restantes on les prend quand meme
+
+
         } else {
             Tile[] tab2 = new Tile[n];
             for (int i = 0; i < n; i++) {
@@ -75,6 +83,11 @@ public class Bag implements Serializable {
             return tab2;
         }
 
+    }
+
+    public List<Tile> getTiles()
+    {
+        return this.tiles;
     }
 
     /**

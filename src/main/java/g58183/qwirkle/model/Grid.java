@@ -68,7 +68,7 @@ public class Grid implements Serializable {
 
 
         if (!isEmpty()) {
-            throw new QwirkleException(View.ORANGE + "Ce n'est pas le premier coup " + View.RESET);
+            throw new QwirkleException(Color.ORANGE + "Ce n'est pas le premier coup " + View.RESET);
         }
 
         if (line.length == 1) {
@@ -107,9 +107,12 @@ public class Grid implements Serializable {
             }
         }
 
+        if(line.length==6){
+            return 12;
+        }
         return line.length;
-
     }
+
 
     private TileAtPosition[] convertToTileAtPosition(int row, int col, Direction d ,Tile... line){
         int deltaRow = d.getDeltaRow();
@@ -141,22 +144,22 @@ public class Grid implements Serializable {
     public int add(int row, int col, Tile tile) throws QwirkleException {
         //vérifier si la coordonnée est correcte
         if (row < 0 || row >= SIZE || col < 0 || col >= SIZE) {
-            throw new QwirkleException(View.ORANGE + "La position ne se trouve pas sur le plateau." + View.RESET);
+            throw new QwirkleException(Color.ORANGE + "La position ne se trouve pas sur le plateau." + View.RESET);
         }
 
         //vérifier si la case est vide
         if (tiles[row][col] != null) {
-            throw new QwirkleException(View.ORANGE + "Une tuile existe déjà à cette position." + View.RESET);
+            throw new QwirkleException(Color.ORANGE + "Une tuile existe déjà à cette position." + View.RESET);
         }
 
         //vérifier que la tuile a au moins un voisin valide
         if (!hasValidNeighbor(row, col, tile)) {
-            throw new QwirkleException(View.ORANGE + "La tuile n'a pas de voisin valide." + View.RESET);
+            throw new QwirkleException(Color.ORANGE + "La tuile n'a pas de voisin valide." + View.RESET);
         }
 
         //vérifier  et qu'il n'y a pas de doublon
         if (!isValidNbAndDoublon(row, col, tile)) {
-            throw new QwirkleException(View.ORANGE + "La tuile créerait un doublon." + View.RESET);
+            throw new QwirkleException(Color.ORANGE + "La tuile créerait un doublon." + View.RESET);
         }
 
         tiles[row][col] = tile;
@@ -219,7 +222,7 @@ public class Grid implements Serializable {
                 && isValidColorOrShape(tile, get(row, col - 1), get(row, col - 2))
                 && isValidColorOrShape(get(row, col-1), get(row, col+1), null)
                 && isValidColorOrShape(get(row-1, col), get(row+1, col), null);
-               //
+
     }
 
     /**
@@ -386,7 +389,7 @@ public class Grid implements Serializable {
                 checkTilesBeforePosed(tile);
                 return scoreFinalByTileAtPosition(tile);
             } else {
-                throw new QwirkleException(View.ORANGE + "Pas la même ligne ou colonne" + View.RESET);
+                throw new QwirkleException(Color.ORANGE + "Pas la même ligne ou colonne" + View.RESET);
             }
 
         } catch (QwirkleException e) {
@@ -408,10 +411,10 @@ public class Grid implements Serializable {
         List<TileAtPosition> myList = Arrays.stream(tile).toList();
 
         if (!isInBoard(tile)) {
-            throw new QwirkleException(View.ORANGE + "La position n'est pas sur le plateau" + View.RESET);
+            throw new QwirkleException(Color.ORANGE + "La position n'est pas sur le plateau" + View.RESET);
         }
         if (!caseVides(tile)) {//if the positions are not empty
-            throw new QwirkleException(View.ORANGE + "Il y'a déjà des tuiles à cette position " + View.RESET);
+            throw new QwirkleException(Color.ORANGE + "Il y'a déjà des tuiles à cette position " + View.RESET);
         }
 
 
@@ -425,7 +428,7 @@ public class Grid implements Serializable {
 
         if (!isValid.contains(true)) {//if there is at least one tile that has neighbors,
             myList.forEach(t -> tiles[t.row()][t.col()] = null);
-            throw new QwirkleException(View.ORANGE + "Les tuiles placées ne sont réliées à aucune ligne." + View.RESET);
+            throw new QwirkleException(Color.ORANGE + "Les tuiles placées ne sont réliées à aucune ligne." + View.RESET);
         }
         //si tous relier à une seule ligne alors on peut vérifier les doublons, en commencant par les ajouter puis vérifier
 
@@ -532,7 +535,6 @@ public class Grid implements Serializable {
         return true;
     }
 
-
     private int scoreFinalForOneTile(TileAtPosition tile){
     int score = 0;
     if(!calculScoreOptimal(tile.row(), tile.col(),Direction.UP).isEmpty()){
@@ -559,18 +561,33 @@ public class Grid implements Serializable {
         if(d==Direction.RIGHT || d==Direction.LEFT){
             score = calculScoreOptimal(line[0].row(), line[0].col(),Direction.RIGHT).size()+1;
 
+           if(score==6){
+               score+=6;
+           }
 
             for (int i = 0; i < line.length; i++) {
                 if(!calculScoreOptimal(line[i].row(), line[i].col(),Direction.UP).isEmpty()){
+                    //si il y a 6 tuiles en verticale bah c'est un +6
+                    if(calculScoreOptimal(line[i].row(), line[i].col(),Direction.UP).size()+1==6){
+                        score+=6;
+                    }
                     score = score+ calculScoreOptimal(line[i].row(), line[i].col(),Direction.UP).size()+1;
+
                 }
             }
         }else{
             score = calculScoreOptimal(line[0].row(), line[0].col(),Direction.UP).size()+1;
-
+            if(score==6){
+                score+=6;
+            }
 
             for (int i = 0; i < line.length; i++) {
                 if(!calculScoreOptimal(line[i].row(), line[i].col(),Direction.RIGHT).isEmpty()){
+
+                    //si il y a 6 tuiles en horizontale bah c'est un +6
+                    if(calculScoreOptimal(line[i].row(), line[i].col(),Direction.UP).size()+1==6){
+                        score+=6;
+                    }
                     score = score+ calculScoreOptimal(line[i].row(), line[i].col(),Direction.RIGHT).size()+1;
                 }
 
@@ -585,16 +602,8 @@ public class Grid implements Serializable {
      * @return a new list of TileAtPos objects without duplicates
      */
     public int removeDuplicates(List<TileAtPosition> tileList) {
-        /*Set<TileAtPosition> uniqueTiles = new HashSet<>();
-        List<TileAtPosition> result = new ArrayList<>();
-        for (TileAtPosition tile : tileList) {
-            if (uniqueTiles.add(tile)) {
-                result.add(tile);
-            }
-        }
-        return result.size();*/
 
-        return tileList.stream().collect(Collectors.toSet()).size();
+        return tileList.stream().collect(Collectors.toSet()).size();//enleve les éléments doubles
 
     }
 
@@ -708,6 +717,21 @@ private boolean containsDoublonsBeforeToPlaceTile(Tile... tile) {
         }
 
         return score;
+    }
+    public boolean canFitSomewhere(Tile tile) {
+        // Iterate over all rows of the board
+        for (int i = 1; i < SIZE - 1; i++) {
+            // Iterate over all columns of the board
+            for (int j = 1; j < SIZE - 1; j++) {
+                // Check if the tile can be placed in the cell (i, j) of the board
+                if (verify(i, j, tile)) {
+                    // If the tile can be placed in this cell, return true
+                    return true;
+                }
+            }
+        }
+        // The tile cannot be placed anywhere on the board, return false
+        return false;
     }
  */
 

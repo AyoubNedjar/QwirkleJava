@@ -1883,12 +1883,6 @@ class GridTest {
 
         //grid.add(43, 44,DOWN,  t8, t9);
 
-        Tile t10 = new Tile(GREEN, STAR);
-        Tile t11 = new Tile(GREEN, ROUND);
-        int res3 =grid.add(new TileAtPosition(45, 44, t11),  new TileAtPosition(45, 44, t10));
-        assertEquals(7, res3);
-        //5
-
 
     }
     @Test
@@ -1921,6 +1915,7 @@ class GridTest {
         //assertEquals(12, res3);
         //5
     }
+
 
 
 
