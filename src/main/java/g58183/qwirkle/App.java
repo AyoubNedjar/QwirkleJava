@@ -33,7 +33,7 @@ public class App {
             try {
                 playGame();
             } catch (Exception e) {
-                System.out.println("bonjour");
+                System.out.println(e.getMessage());
             }
 
         }else{

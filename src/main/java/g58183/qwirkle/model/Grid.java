@@ -153,6 +153,9 @@ public class Grid implements Serializable {
         }
 
         //vérifier que la tuile a au moins un voisin valide
+        if(tile.color()==Color.GREEN){
+
+        }
         if (!hasValidNeighbor(row, col, tile)) {
             throw new QwirkleException(Color.ORANGE + "La tuile n'a pas de voisin valide." + View.RESET);
         }
@@ -167,6 +170,10 @@ public class Grid implements Serializable {
         return scoreFinalForOneTile(new TileAtPosition(row, col, tile));
     }
 
+
+
+
+
     /**
      * This method allows to compare colors or shapes to be applied on the line
      * by comparing adjacent tiles.
@@ -178,13 +185,30 @@ public class Grid implements Serializable {
      */
     private boolean isValidColorOrShape(Tile t1, Tile t2, Tile t3) {
 
-        if (t1 == null || t2==null) {
-            return true;
+        //code défense
+        if(t1.color()==Color.GREEN){
+            if (t1 == null || t2==null) {
+                return true;
+            }
+            if (t3 == null) {
+                return ((t1.shape() == t2.shape()));
+            }
+            if (t3 == null) {
+                return ((t1.shape() == t2.shape()));
+            }
+            return ((t1.shape() == t2.shape() && t1.shape() == t3.shape()));
+
+        }else{
+            if (t1 == null || t2==null) {
+                return true;
+            }
+            if (t3 == null) {
+                return (t1.color() == t2.color()) || (t1.shape() == t2.shape());
+            }
+            return (t1.color() == t2.color() && t1.color() == t3.color()) || (t1.shape() == t2.shape() && t1.shape() == t3.shape());
         }
-        if (t3 == null) {
-            return (t1.color() == t2.color()) || (t1.shape() == t2.shape());
-        }
-        return (t1.color() == t2.color() && t1.color() == t3.color()) || (t1.shape() == t2.shape() && t1.shape() == t3.shape());
+
+
     }
 
     /**
